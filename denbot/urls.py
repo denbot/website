@@ -16,7 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls.conf import include
+
+import denbot.views
 
 urlpatterns = [
+    path('', denbot.views.index, name='index'),
+    path('auth/', include('authentication.urls')),
     path('admin/', admin.site.urls),
 ]

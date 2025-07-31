@@ -47,7 +47,7 @@ ROOT_URLCONF = 'denbot.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,3 +94,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model, since we use passwordless login
 AUTH_USER_MODEL = "authentication.DenbotUser"
+
+# Where do we redirect to if we run into a "login required" section
+LOGIN_URL = '/auth/login'
