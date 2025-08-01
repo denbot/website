@@ -372,3 +372,35 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/django,visualstudiocode,pycharm+all,python
 
+### Frontend App:
+
+# dependencies
+frontend/node_modules
+
+# testing
+frontend/coverage
+
+# next.js
+frontend/.next/
+frontend/out/
+
+# production
+frontend/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
