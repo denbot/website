@@ -1,0 +1,44 @@
+name: denbot-website
+services:
+  denbot-frontend:
+    container_name: denbot-frontend
+    # Build the image from the Dockerfile in the frontend directory
+    build: frontend
+    # Host the React application on port 3000
+    ports:
+      - "3000:3000"
+    develop:
+      watch:
+        # Sync the working directory with the `/app` directory in the container
+        - action: sync
+          path: frontend
+          target: /app
+          # Exclude node modules
+          ignore:
+            - frontend/node_modules/
+        # Rebuild the image if dependencies change by checking package-lock.json
+        - action: rebuild
+          path: frontend/package-lock.json
+  denbot-backend:
+    container_name: denbot-backend
+    # Build the image from the Dockerfile in the current directory
+    build: .
+    # Host the Django application on port 8000
+    ports:
+      - "8000:8000"
+    develop:
+      # Create a `watch` configuration to update the app
+      watch:
+        # Sync the working directory with the `/app` directory in the container
+        - action: sync
+          path: .
+          target: /app
+          # Exclude the project virtual environment — it could be for a
+          # different platform in the container
+          ignore:
+            - .venv/
+            # Also exclude the web app
+            - frontend
+        # Rebuild the image if dependencies change by checking uv.lock
+        - action: rebuild
+          path: ./uv.lock
