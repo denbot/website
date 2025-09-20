@@ -6,7 +6,7 @@ class PhoneNumberForm(forms.Form):
     phone_number = PhoneNumberField()
 
     def send_otp(self):
-        print("HELP I DON'T KNOW HOW TO SEND AN OTP")
+        print("HALP I DON'T KNOW HOW TO SEND AN OTP")
 
 
 class OTPForm(forms.Form):

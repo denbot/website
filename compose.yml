@@ -8,6 +8,7 @@ services:
     ports:
       - "3000:3000"
     develop:
+    # Create a `watch` configuration to update the app to respond to any changes made
       watch:
         # Sync the working directory with the `/app` directory in the container
         - action: sync
@@ -21,24 +22,21 @@ services:
           path: frontend/package-lock.json
   denbot-backend:
     container_name: denbot-backend
-    # Build the image from the Dockerfile in the current directory
-    build: .
+    # Build the image from the Dockerfile in the backend directory
+    build: backend
     # Host the Django application on port 8000
     ports:
       - "8000:8000"
     develop:
-      # Create a `watch` configuration to update the app
+      # Create a `watch` configuration to update the app to respond to any changes made
       watch:
         # Sync the working directory with the `/app` directory in the container
         - action: sync
-          path: .
+          path: backend
           target: /app
-          # Exclude the project virtual environment — it could be for a
-          # different platform in the container
+          # Exclude the project virtual environment
           ignore:
-            - .venv/
-            # Also exclude the web app
-            - frontend
+            - backend/.venv/
         # Rebuild the image if dependencies change by checking uv.lock
         - action: rebuild
-          path: ./uv.lock
+          path: backend/uv.lock
