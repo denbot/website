@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "axios": "^1.11.0",
-    "next": "15.4.5",
+    "next": "^15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "swr": "^2.3.4"
@@ -24,14 +24,9 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "eslint-config-prettier": "^10.1.8",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.1.4",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
-  },
-  "lint-staged": {
-    "*.{ts|tsx}": "eslint --cache --fix && prettier --write"
   },
   "prettier": {
     "experimentalTernaries": true,
