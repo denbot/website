@@ -8,6 +8,8 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from django.conf import settings
 
+from authentication.utils.validate_jwt import validate_jwt
+
 api_key = os.environ["TWILIO_API_KEY"]
 api_secret = os.environ["TWILIO_API_SECRET"]
 account_sid = os.environ["TWILIO_ACCOUNT_SID"]
@@ -62,3 +64,12 @@ class LoginOtpAPIView(APIView):
             self.addJWT(response)
 
         return response
+    
+class JWTVerificationView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get("authToken")
+        try:
+            payload = validate_jwt(token)
+            return Response({"valid": True, "user_id": payload.get("user_id")})
+        except ValueError as e:
+            return Response({"valid": False, "reason": str(e)}, status=401)
