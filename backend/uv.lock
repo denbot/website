@@ -135,6 +135,7 @@ dependencies = [
     { name = "django" },
     { name = "django-phonenumber-field", extra = ["phonenumberslite"] },
     { name = "djangorestframework" },
+    { name = "pyjwt" },
     { name = "python-dotenv" },
     { name = "twilio" },
 ]
@@ -144,6 +145,7 @@ requires-dist = [
     { name = "django", specifier = ">=5.2.1" },
     { name = "django-phonenumber-field", extras = ["phonenumberslite"], specifier = ">=8.1.0" },
     { name = "djangorestframework", specifier = ">=3.16.1" },
+    { name = "pyjwt", specifier = ">=2.10.1" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "twilio", specifier = ">=9.8.1" },
 ]
