@@ -1,26 +1,20 @@
 import { AxiosResponse } from 'axios';
 import { axiosInstance } from './axios';
-import {
-  AuthFlowResponse,
-  AuthStatus,
-} from '@/models/auth-flow-response.model';
+import { AuthStatus } from '@/models/auth-flow-response.model';
 
-async function login(phoneNumber: string): Promise<AuthFlowResponse> {
-  const { data, status }: AxiosResponse<{ status: AuthStatus }> =
+async function login(phoneNumber: string): Promise<AuthStatus> {
+  const { data }: AxiosResponse<{ status: AuthStatus }> =
     await axiosInstance.post('/auth/login', { phoneNumber });
-  return { error: status != 200, status: data.status };
+  return data.status;
 }
 
-async function loginOtp(
-  phoneNumber: string,
-  otp: string,
-): Promise<AuthFlowResponse> {
-  const { data, status }: AxiosResponse<{ status: AuthStatus }> =
+async function loginOtp(phoneNumber: string, otp: string): Promise<AuthStatus> {
+  const { data }: AxiosResponse<{ status: AuthStatus }> =
     await axiosInstance.post('/auth/login_otp', {
       phoneNumber,
       verificationCode: otp,
     });
-  return { error: status != 200, status: data.status };
+  return data.status;
 }
 
 export { login, loginOtp };

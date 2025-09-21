@@ -6,9 +6,5 @@ export type AuthStatus =
   | 'max_attempts_reached'
   | 'deleted'
   | 'failed'
-  | 'expired';
-
-export interface AuthFlowResponse {
-  error: boolean;
-  status: AuthStatus;
-}
+  | 'expired'
+  | 'error';

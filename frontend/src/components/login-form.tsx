@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  AuthFlowResponse,
-  AuthStatus,
-} from '@/models/auth-flow-response.model';
+import { AuthStatus } from '@/models/auth-flow-response.model';
 import { login, loginOtp } from '@/services/authentication';
 import { Stack, TextField, Button, Typography } from '@mui/material';
 import { matchIsValidTel, MuiTelInput } from 'mui-tel-input';
@@ -18,7 +15,6 @@ export default function LoginForm() {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [phoneNumberError, setPhoneNumberError] = useState<boolean>(false);
   const [otp, setOtp] = useState<string>('');
-  const [error, setError] = useState<boolean>(false);
   const [resendTimer, setResendTimer] = useState<number>(0);
   const [warningText, setWarningText] = useState<string>('');
 
@@ -48,24 +44,19 @@ export default function LoginForm() {
   };
 
   const submitPhoneNumber = async () => {
-    const { error, status }: AuthFlowResponse = await login(phoneNumber);
+    const status: AuthStatus = await login(phoneNumber);
     setStatus(status);
     if (status == 'pending') {
       startResendTimer();
     }
-    setError(error);
   };
 
   const submitOtp = async (code: string) => {
     setWarningText('');
-    const { error, status }: AuthFlowResponse = await loginOtp(
-      phoneNumber,
-      code,
-    );
+    const status: AuthStatus = await loginOtp(phoneNumber, code);
     if (status == 'approved') {
       handleRedirect();
     }
-    setError(error);
     setStatus(status);
     setWarningText(getWarningText());
   };
@@ -109,6 +100,7 @@ export default function LoginForm() {
     switch (status) {
       case 'initial':
       case 'approved':
+      case 'error':
         return '';
       case 'pending':
         return 'Verification code incorrect.';
@@ -156,7 +148,7 @@ export default function LoginForm() {
           {warningText}
         </Typography>
       )}
-      {error && (
+      {status == 'error' && (
         <Typography
           variant="body1"
           color="error"
