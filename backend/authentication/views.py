@@ -1,25 +1,36 @@
-from django.urls.base import reverse_lazy
-from django.views.generic.edit import FormView
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
-from authentication.forms import PhoneNumberForm, OTPForm
+import os
+from twilio.rest import Client
 
-
-class LoginFormView(FormView):
-    template_name = 'authentication/login.html'
-    form_class = PhoneNumberForm
-    success_url = reverse_lazy('login_otp')
-
-    def form_valid(self, form):
-        form.send_otp()
-        # TODO Send back form with OTP field
-        return super().form_valid(form)
+api_key = os.environ["TWILIO_API_KEY"]
+api_secret = os.environ["TWILIO_API_SECRET"]
+account_sid = os.environ["TWILIO_ACCOUNT_SID"]
+service_sid = os.environ['TWILIO_SERVICE_SID']
+client = Client(api_key, api_secret, account_sid)
 
 
-class LoginOtpFormView(FormView):
-    template_name = 'authentication/login_otp.html'
-    form_class = OTPForm
-    success_url = '/NOT_BLEGH'
+class LoginAPIView(APIView):
+    def post(self, request):
+        # Probably a better way to get/validate things but I don't know or care what that is rn
+        phone_number = request.data.get("phoneNumber", "")
 
-    def form_valid(self, form):
-        form.verify_otp()  # We should probably do something about this
-        return super().form_valid(form)
+        # Send off twilio thing here
+        success = client.verify.v2.services(
+            service_sid
+        ).verifications.create(to=phone_number, channel="sms")
+        return Response({"success": success.status == "pending"})
+
+
+class LoginOtpAPIView(APIView):
+    def post(self, request):
+        # Probably a better way to get/validate things but I don't know or care what that is rn
+        phone_number = request.data.get("phoneNumber", "")
+        verification_code = request.data.get("verificationCode", "")
+
+        # Send off twilio thing here
+        success = client.verify.v2.services(
+    service_sid
+).verification_checks.create(to=phone_number, code=verification_code)
+        return Response({"success": success.status == "approved"})

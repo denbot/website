@@ -55,9 +55,6 @@ class DenbotUser(models.Model):
     phone = PhoneNumberField(unique=True)
     phone_verified = models.BooleanField(default=False)
 
-    login_otp = models.CharField(max_length=10, null=True, blank=True)
-    login_otp_set = models.DateTimeField(_("Login OTP Set Date/Time"), null=True, blank=True)
-
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
