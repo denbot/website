@@ -1,16 +1,18 @@
-import ClientLayout from '../components/client-layout';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import '../style/globals.css';
+import { Roboto } from 'next/font/google';
+
+import theme from '@/style/theme';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { Roboto } from 'next/font/google';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from '@/style/theme';
 import { CssBaseline } from '@mui/material';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { ThemeProvider } from '@mui/material/styles';
+
+import ClientLayout from '../components/client-layout';
+import '../style/globals.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

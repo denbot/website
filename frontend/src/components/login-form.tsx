@@ -1,11 +1,14 @@
 'use client';
 
+import { useRef, useState } from 'react';
+
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import { AuthStatus } from '@/models/auth-flow-response.model';
 import { login, loginOtp } from '@/services/authentication';
-import { Stack, TextField, Button, Typography } from '@mui/material';
-import { matchIsValidTel, MuiTelInput } from 'mui-tel-input';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { Button, Stack, TextField, Typography } from '@mui/material';
+import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
+
 import ThemedLogo from './themed-logo';
 
 const VERIFICATION_CODE_LENGTH = 6;

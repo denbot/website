@@ -1,7 +1,8 @@
 'use client';
 
-import { useColorScheme } from '@mui/material/styles';
 import Image from 'next/image';
+
+import { useColorScheme } from '@mui/material/styles';
 
 export default function ThemedLogo() {
   const { mode, systemMode } = useColorScheme();

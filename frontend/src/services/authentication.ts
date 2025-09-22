@@ -1,6 +1,7 @@
-import { AxiosResponse } from 'axios';
-import { axiosInstance } from './axios';
 import { AuthStatus } from '@/models/auth-flow-response.model';
+import { AxiosResponse } from 'axios';
+
+import { axiosInstance } from './axios';
 
 async function login(phoneNumber: string): Promise<AuthStatus> {
   const { data }: AxiosResponse<{ status: AuthStatus }> =

@@ -1,5 +1,6 @@
-import LoginForm from '@/components/login-form';
 import { Box, Container, Paper } from '@mui/material';
+
+import LoginForm from '@/components/login-form';
 
 export default function LoginPage() {
   return (
