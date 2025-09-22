@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
-from django.conf import settings
-import jwt
 
-def validate_jwt(token):
+import jwt
+from django.conf import settings
+
+
+def validate_jwt(token: str) -> dict:
     """Return payload if valid, else raise exception"""
     if not token:
         raise ValueError("No token provided")

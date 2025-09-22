@@ -12,3 +12,23 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "twilio>=9.8.1",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.13.1",
+]
+
+[tool.ruff]
+lint.select = ["F", "E", "W", "ANN", "I", "C", "Q"]  
+lint.per-file-ignores = { "denbot/settings/*.py" = ["F403", "F401"] }
+# F: pyflakes, E/W: pycodestyle, ANN: annotations, I: imports, C: complexity
+line-length = 88
+
+# Exclude Django auto-generated files
+exclude = [
+    "*/migrations/*",
+    "*/__init__.py",
+    "manage.py",
+    "settings.py",
+    "authentication/management/commands/createsuperuser.py"
+]

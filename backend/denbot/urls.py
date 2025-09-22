@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
@@ -21,7 +22,7 @@ from django.urls.conf import include
 import denbot.views
 
 urlpatterns = [
-    path('', denbot.views.index, name='index'),
-    path('api/auth/', include('authentication.urls')),
-    path('admin/', admin.site.urls),
+    path("", denbot.views.index, name="index"),
+    path("api/auth/", include("authentication.urls")),
+    path("admin/", admin.site.urls),
 ]
