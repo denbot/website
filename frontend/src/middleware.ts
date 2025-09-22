@@ -30,5 +30,5 @@ export async function middleware(req: NextRequest) {
 
 // Apply middleware to all pages except /login, /, and static files
 export const config = {
-  matcher: ['/((?!login$|$|_next/).*)'],
+  matcher: ['/((?!login$|$|_next/|images).*)'],
 };

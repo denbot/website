@@ -6,6 +6,7 @@ import { Stack, TextField, Button, Typography } from '@mui/material';
 import { matchIsValidTel, MuiTelInput } from 'mui-tel-input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useRef, useState } from 'react';
+import ThemedLogo from './themed-logo';
 
 const VERIFICATION_CODE_LENGTH = 6;
 const RESEND_TIMER_LENGTH = 30;
@@ -115,6 +116,7 @@ export default function LoginForm() {
 
   return (
     <Stack spacing={2}>
+      <ThemedLogo />
       <MuiTelInput
         id="phone_number"
         label="Phone Number"
