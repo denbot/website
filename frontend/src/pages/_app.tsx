@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.css';
+import '../style/globals.css';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import ClientLayout from './client-layout';
+import { AppProps } from 'next/app';
+import Layout from '@/components/layout';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -23,18 +24,14 @@ export const metadata: Metadata = {
   description: 'Placeholder',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <html lang="en">
+    <Layout>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClientLayout>{children}</ClientLayout>
+        <Component {...pageProps} />
       </body>
-    </html>
+    </Layout>
   );
 }
