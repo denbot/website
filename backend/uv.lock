@@ -154,7 +154,6 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "twilio", specifier = ">=9.8.1" },
 ]
-provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.13.1" }]

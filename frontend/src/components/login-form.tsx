@@ -62,9 +62,10 @@ export default function LoginForm() {
     const status: AuthStatus = await loginOtp(phoneNumber, code);
     if (status == 'approved') {
       handleRedirect();
+    } else {
+      setStatus(status);
+      setWarningText(getWarningText());
     }
-    setStatus(status);
-    setWarningText(getWarningText());
   };
 
   const handleRedirect = () => {
