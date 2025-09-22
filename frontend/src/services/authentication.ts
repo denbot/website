@@ -1,5 +1,6 @@
+import type { AxiosResponse } from 'axios';
+
 import { AuthStatus } from '@/models/auth-flow-response.model';
-import { AxiosResponse } from 'axios';
 
 import { axiosInstance } from './axios';
 

@@ -1,13 +1,15 @@
 'use client';
 
-import { useRef, useState } from 'react';
-
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useRef, useState } from 'react';
 
 import { AuthStatus } from '@/models/auth-flow-response.model';
 import { login, loginOtp } from '@/services/authentication';
-import { Button, Stack, TextField, Typography } from '@mui/material';
-import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 
 import ThemedLogo from './themed-logo';
 
