@@ -1,6 +1,6 @@
 name: denbot-website
 services:
-  denbot-frontend:
+  frontend:
     container_name: denbot-frontend
     # Build the image from the Dockerfile in the frontend directory
     build: frontend
@@ -20,7 +20,7 @@ services:
         # Rebuild the image if dependencies change by checking package-lock.json
         - action: rebuild
           path: frontend/package-lock.json
-  denbot-backend:
+  backend:
     container_name: denbot-backend
     # Build the image from the Dockerfile in the backend directory
     build: backend
@@ -40,3 +40,15 @@ services:
         # Rebuild the image if dependencies change by checking uv.lock
         - action: rebuild
           path: backend/uv.lock
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      # - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./infra/certs:/etc/nginx/certs:ro
+      # - ./infra/storage/logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend

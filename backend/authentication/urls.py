@@ -3,6 +3,7 @@ from django.urls.conf import path
 from authentication import views
 
 urlpatterns = [
-    path("login", views.LoginFormView.as_view(), name="login"),
-    path("login_otp", views.LoginOtpFormView.as_view(), name="login_otp"),
+    path("login", views.LoginAPIView.as_view(), name="login"),
+    path("login_otp", views.LoginOtpAPIView.as_view(), name="login_otp"),
+    path("validate_user", views.JWTVerificationView.as_view(), name="validate_user"),
 ]

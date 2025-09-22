@@ -1,25 +1,74 @@
-from django.urls.base import reverse_lazy
-from django.views.generic.edit import FormView
+import os
+from datetime import datetime, timedelta, timezone
 
-from authentication.forms import PhoneNumberForm, OTPForm
+import jwt
+from django.conf import settings
+from django.http import HttpRequest
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from twilio.rest import Client
+
+from authentication.utils.validate_jwt import validate_jwt
+
+api_key = os.environ["TWILIO_API_KEY"]
+api_secret = os.environ["TWILIO_API_SECRET"]
+account_sid = os.environ["TWILIO_ACCOUNT_SID"]
+service_sid = os.environ["TWILIO_SERVICE_SID"]
+client = Client(api_key, api_secret, account_sid)
 
 
-class LoginFormView(FormView):
-    template_name = 'authentication/login.html'
-    form_class = PhoneNumberForm
-    success_url = reverse_lazy('login_otp')
+class LoginAPIView(APIView):
+    def post(self, request: HttpRequest) -> Response:
+        phone_number = request.data.get("phoneNumber", "")
 
-    def form_valid(self, form):
-        form.send_otp()
-        # TODO Send back form with OTP field
-        return super().form_valid(form)
+        # Send off twilio thing here
+        twilio_response = client.verify.v2.services(service_sid).verifications.create(
+            to=phone_number, channel="sms"
+        )
+        return Response({"status": twilio_response.status})
 
 
-class LoginOtpFormView(FormView):
-    template_name = 'authentication/login_otp.html'
-    form_class = OTPForm
-    success_url = '/NOT_BLEGH'
+class LoginOtpAPIView(APIView):
+    def addJWT(self, response: Response) -> None:
+        # for testing, 12345 for id and 1 hour expiry, needs to be updated later.
+        # TODO: set these to better values (actual user id and end of the season)
+        payload = {
+            "user_id": "12345",
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+        }
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
 
-    def form_valid(self, form):
-        form.verify_otp()  # We should probably do something about this
-        return super().form_valid(form)
+        response.set_cookie(
+            key="authToken",
+            value=token,
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+            max_age=3600,
+        )
+
+    def post(self, request: HttpRequest) -> Response:
+        phone_number = request.data.get("phoneNumber", "")
+        verification_code = request.data.get("verificationCode", "")
+
+        # Send off twilio thing here
+        twilio_response = client.verify.v2.services(
+            service_sid
+        ).verification_checks.create(to=phone_number, code=verification_code)
+
+        response = Response({"status": twilio_response.status})
+
+        if twilio_response.status == "approved":
+            self.addJWT(response)
+
+        return response
+
+
+class JWTVerificationView(APIView):
+    def get(self, request: HttpRequest) -> Response:
+        token = request.COOKIES.get("authToken")
+        try:
+            payload = validate_jwt(token)
+            return Response({"valid": True, "user_id": payload.get("user_id")})
+        except ValueError as e:
+            return Response({"valid": False, "reason": str(e)}, status=401)
