@@ -6,7 +6,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class DenbotUserManager(models.Manager):
-    def create_user(self, phone: str, date_of_birth: str, id: str = None):  # noqa: ANN201
+    def create_user(  # noqa: ANN201
+        self, phone: str, date_of_birth: str = "1900-01-01", id: str = None
+    ):
         """
         :rtype: DenbotUser
         """
@@ -27,7 +29,9 @@ class DenbotUserManager(models.Manager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone: str, date_of_birth: str, id: str = None):  # noqa: ANN201
+    def create_superuser(  # noqa: ANN201
+        self, phone: str, date_of_birth: str = "1900-01-01", id: str = None
+    ):
         """
         :rtype: DenbotUser
         """
@@ -50,6 +54,16 @@ class DenbotUserManager(models.Manager):
         """
         return self.get(**{self.model.USERNAME_FIELD: primary_key})
 
+    def get_or_create_user(self, phone: str):  # noqa: ANN201
+        """
+        :rtype: DenbotUser
+        """
+        try:
+            return self.get(phone=phone)
+        except self.model.DoesNotExist:
+            user = self.create_user(phone=phone)
+            return user
+
 
 class DenbotUser(models.Model):
     id = models.UUIDField(primary_key=True, unique=True)
@@ -57,11 +71,6 @@ class DenbotUser(models.Model):
 
     phone = PhoneNumberField(unique=True)
     phone_verified = models.BooleanField(default=False)
-
-    login_otp = models.CharField(max_length=10, null=True, blank=True)
-    login_otp_set = models.DateTimeField(
-        _("Login OTP Set Date/Time"), null=True, blank=True
-    )
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)

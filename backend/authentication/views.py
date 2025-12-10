@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
+from authentication.models import DenbotUser
 from authentication.utils.validate_jwt import validate_jwt
 
 api_key = os.environ["TWILIO_API_KEY"]
@@ -22,7 +23,7 @@ class LoginAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
 
-        # TODO: Create user if does not exist
+        # don't create user here, wait until they have verified.
 
         try:
             twilio_response = client.verify.v2.services(
@@ -34,11 +35,12 @@ class LoginAPIView(APIView):
 
 
 class LoginOtpAPIView(APIView):
-    def addJWT(self, response: Response) -> None:
-        # for testing, 12345 for id and 1 hour expiry, needs to be updated later.
-        # TODO: set these to better values (actual user id and end of the season)
+    def addJWT(self, user: DenbotUser, response: Response) -> None:
+        # for testing, 1 hour expiry, needs to be updated later.
+        # TODO: set end of the season
+
         payload = {
-            "user_id": "12345",
+            "user_id": str(user.id),
             "exp": datetime.now(timezone.utc) + timedelta(hours=1),
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
@@ -64,7 +66,8 @@ class LoginOtpAPIView(APIView):
             response = Response({"status": twilio_response.status})
 
             if twilio_response.status == "approved":
-                self.addJWT(response)
+                user = DenbotUser.objects.get_or_create_user(phone=phone_number)
+                self.addJWT(user, response)
 
             return response
         except TwilioRestException:
