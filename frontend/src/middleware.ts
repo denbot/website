@@ -2,6 +2,8 @@ import { NextURL } from 'next/dist/server/web/next-url';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import { CookieValidationResponse } from './models/cookie-validation-response.model';
+
 export async function middleware(req: NextRequest) {
   const url: NextURL = req.nextUrl.clone();
 
@@ -10,7 +12,7 @@ export async function middleware(req: NextRequest) {
   // TODO: this seems a bit off, rethink/rework
   try {
     const fetchResult: Response = await fetch(
-      `http://nginx/api/auth/validate_user`,
+      `${process.env.MIDDLEWARE_BACKEND_URL}/auth/validate_user`,
       {
         headers: {
           Host: req.nextUrl.host,
@@ -18,7 +20,10 @@ export async function middleware(req: NextRequest) {
         },
       },
     );
-    const isLoggedIn: boolean = fetchResult.status == 200;
+
+    const response: CookieValidationResponse =
+      (await fetchResult.json()) as CookieValidationResponse;
+    const isLoggedIn: boolean = response.valid;
 
     if (!isLoggedIn) {
       const loginUrl = new URL('/login', req.url);

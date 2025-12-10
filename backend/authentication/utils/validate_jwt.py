@@ -3,6 +3,8 @@ from datetime import datetime, timezone
 import jwt
 from django.conf import settings
 
+from authentication.models import DenbotUser
+
 
 def validate_jwt(token: str) -> dict:
     """Return payload if valid, else raise exception"""
@@ -17,6 +19,17 @@ def validate_jwt(token: str) -> dict:
 
         if datetime.now(timezone.utc).timestamp() > exp:
             raise ValueError("Token expired")
+
+        id = payload.get("user_id")
+        if id is None:
+            raise ValueError("Token missing user id")
+
+        user = DenbotUser.objects.get(id=id)
+        if user is None:
+            raise ValueError("User does not exist")
+
+        if not user.is_active:
+            raise ValueError("User account not active")
 
         return payload
 

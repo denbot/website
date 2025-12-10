@@ -17,7 +17,8 @@ from authentication.utils.validate_jwt import validate_jwt
 class LoginAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
-
+        if not settings.USE_TWILIO_AUTH:
+            return Response({"status": "created"})
         # don't create user here, wait until they have verified.
         status = try_twilio_auth_create(phone_number)
         if status != "error":
@@ -49,8 +50,12 @@ class LoginOtpAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
+        status = "error"
+        if not settings.USE_TWILIO_AUTH:
+            status = "approved" if verification_code == settings.DEV_OTP else "failed"
+        else:
+            status = try_twilio_auth_verify(phone_number, verification_code)
 
-        status = try_twilio_auth_verify(phone_number, verification_code)
         response = Response({"status": status})
 
         if status == "error":

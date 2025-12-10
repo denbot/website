@@ -62,12 +62,11 @@ export default function LoginForm() {
   const submitOtp = async (code: string) => {
     setWarningText('');
     const status: AuthStatus = await loginOtp(phoneNumber, code);
+    setStatus(status);
+    setShowOtp(status != 'error' && status != 'too_many_attempts');
+    setWarningText(getWarningText());
     if (status == 'approved') {
       handleRedirect();
-    } else {
-      setStatus(status);
-      setShowOtp(status != 'error' && status != 'too_many_attempts');
-      setWarningText(getWarningText());
     }
   };
 

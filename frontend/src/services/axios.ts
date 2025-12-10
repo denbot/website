@@ -6,7 +6,7 @@ import axios, {
 import toast from 'react-hot-toast';
 
 export const axiosInstance: AxiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   timeout: 1000,
 });
 
