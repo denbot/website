@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
 from authentication.utils.validate_jwt import validate_jwt
@@ -21,11 +22,15 @@ class LoginAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
 
-        # Send off twilio thing here
-        twilio_response = client.verify.v2.services(service_sid).verifications.create(
-            to=phone_number, channel="sms"
-        )
-        return Response({"status": twilio_response.status})
+        # TODO: Create user if does not exist
+
+        try:
+            twilio_response = client.verify.v2.services(
+                service_sid
+            ).verifications.create(to=phone_number, channel="sms")
+            return Response({"status": twilio_response.status})
+        except TwilioRestException:
+            return Response({"status": "failed"}, status=500)
 
 
 class LoginOtpAPIView(APIView):
@@ -51,17 +56,19 @@ class LoginOtpAPIView(APIView):
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
 
-        # Send off twilio thing here
-        twilio_response = client.verify.v2.services(
-            service_sid
-        ).verification_checks.create(to=phone_number, code=verification_code)
+        try:
+            twilio_response = client.verify.v2.services(
+                service_sid
+            ).verification_checks.create(to=phone_number, code=verification_code)
 
-        response = Response({"status": twilio_response.status})
+            response = Response({"status": twilio_response.status})
 
-        if twilio_response.status == "approved":
-            self.addJWT(response)
+            if twilio_response.status == "approved":
+                self.addJWT(response)
 
-        return response
+            return response
+        except TwilioRestException:
+            return Response({"status": "failed"}, status=500)
 
 
 class JWTVerificationView(APIView):

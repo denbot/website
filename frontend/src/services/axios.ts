@@ -1,4 +1,8 @@
-import axios, { type AxiosInstance } from 'axios';
+import axios, {
+  AxiosError,
+  type AxiosInstance,
+  type AxiosResponse,
+} from 'axios';
 import toast from 'react-hot-toast';
 
 export const axiosInstance: AxiosInstance = axios.create({
@@ -7,12 +11,11 @@ export const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
     if (error.response) {
       const status = error.response.status;
-      const message =
-        error.response.data?.reason || error.response.data?.message || null;
+      const message = error.response.statusText;
 
       if (status === 401) {
         toast.error('You need to log in.');
