@@ -23,6 +23,7 @@ export default function LoginForm() {
   const [otp, setOtp] = useState<string>('');
   const [resendTimer, setResendTimer] = useState<number>(0);
   const [warningText, setWarningText] = useState<string>('');
+  const [showOtp, setShowOtp] = useState<boolean>(false);
 
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function LoginForm() {
   const submit = () => {
     if (status == 'initial') {
       submitPhoneNumber();
-    } else if (status == 'pending') {
+    } else {
       submitOtp(otp);
     }
   };
@@ -52,7 +53,8 @@ export default function LoginForm() {
   const submitPhoneNumber = async () => {
     const status: AuthStatus = await login(phoneNumber);
     setStatus(status);
-    if (status == 'pending') {
+    if (status != 'error') {
+      setShowOtp(true);
       startResendTimer();
     }
   };
@@ -64,6 +66,7 @@ export default function LoginForm() {
       handleRedirect();
     } else {
       setStatus(status);
+      setShowOtp(status != 'error' && status != 'too_many_attempts');
       setWarningText(getWarningText());
     }
   };
@@ -97,7 +100,7 @@ export default function LoginForm() {
   const isSubmitButtonDisabled = (): boolean => {
     if (status == 'initial') {
       return !matchIsValidTel(phoneNumber);
-    } else if (status == 'pending') {
+    } else if (status != 'error') {
       return !isOtpValid(otp);
     }
     return true;
@@ -106,17 +109,16 @@ export default function LoginForm() {
   const getWarningText = () => {
     switch (status) {
       case 'initial':
+      case 'created':
       case 'approved':
       case 'error':
         return '';
-      case 'pending':
-        return 'Verification code incorrect.';
-      case 'canceled':
-      case 'max_attempts_reached':
-      case 'deleted':
       case 'failed':
+        return 'Verification code incorrect.';
       case 'expired':
-        return 'Verification code no longer valid. Request a new code.';
+        return 'Verification code no longer valid. New code has been requested.';
+      case 'too_many_attempts':
+        return 'Too many recent failed login attempts. Try again later.';
     }
   };
 
@@ -138,7 +140,7 @@ export default function LoginForm() {
         defaultCountry="US"
         disableDropdown
       />
-      {status == 'pending' && (
+      {showOtp && (
         <TextField
           id="otp"
           label="Verification Code"
@@ -164,15 +166,17 @@ export default function LoginForm() {
           Oops! something went wrong
         </Typography>
       )}
-      <Button
-        onClick={submit}
-        disabled={isSubmitButtonDisabled()}
-        variant="contained"
-        size="large"
-      >
-        Submit
-      </Button>
-      {status != 'initial' && (
+      {(showOtp || status == 'initial') && (
+        <Button
+          onClick={submit}
+          disabled={isSubmitButtonDisabled()}
+          variant="contained"
+          size="large"
+        >
+          Submit
+        </Button>
+      )}
+      {showOtp && (
         <Button
           onClick={submitPhoneNumber}
           variant="contained"

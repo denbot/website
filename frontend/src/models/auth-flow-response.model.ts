@@ -1,10 +1,8 @@
 export type AuthStatus =
   | 'initial'
-  | 'pending'
+  | 'created'
   | 'approved'
-  | 'canceled'
-  | 'max_attempts_reached'
-  | 'deleted'
   | 'failed'
   | 'expired'
-  | 'error';
+  | 'error'
+  | 'too_many_attempts';

@@ -1,5 +1,4 @@
 import type { AxiosResponse } from 'axios';
-import toast from 'react-hot-toast';
 
 import { AuthStatus } from '@/models/auth-flow-response.model';
 

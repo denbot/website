@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -6,17 +5,13 @@ from django.conf import settings
 from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from twilio.base.exceptions import TwilioRestException
-from twilio.rest import Client
 
 from authentication.models import DenbotUser
+from authentication.utils.twilio_auth import (
+    try_twilio_auth_create,
+    try_twilio_auth_verify,
+)
 from authentication.utils.validate_jwt import validate_jwt
-
-api_key = os.environ["TWILIO_API_KEY"]
-api_secret = os.environ["TWILIO_API_SECRET"]
-account_sid = os.environ["TWILIO_ACCOUNT_SID"]
-service_sid = os.environ["TWILIO_SERVICE_SID"]
-client = Client(api_key, api_secret, account_sid)
 
 
 class LoginAPIView(APIView):
@@ -24,14 +19,11 @@ class LoginAPIView(APIView):
         phone_number = request.data.get("phoneNumber", "")
 
         # don't create user here, wait until they have verified.
-
-        try:
-            twilio_response = client.verify.v2.services(
-                service_sid
-            ).verifications.create(to=phone_number, channel="sms")
-            return Response({"status": twilio_response.status})
-        except TwilioRestException:
-            return Response({"status": "failed"}, status=500)
+        status = try_twilio_auth_create(phone_number)
+        if status != "error":
+            return Response({"status": status})
+        else:
+            return Response({"status": status}, status=500)
 
 
 class LoginOtpAPIView(APIView):
@@ -58,20 +50,16 @@ class LoginOtpAPIView(APIView):
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
 
-        try:
-            twilio_response = client.verify.v2.services(
-                service_sid
-            ).verification_checks.create(to=phone_number, code=verification_code)
+        status = try_twilio_auth_verify(phone_number, verification_code)
+        response = Response({"status": status})
 
-            response = Response({"status": twilio_response.status})
+        if status == "error":
+            response = Response({"status": status}, status=500)
+        if status == "approved":
+            user = DenbotUser.objects.get_or_create_user(phone=phone_number)
+            self.addJWT(user, response)
 
-            if twilio_response.status == "approved":
-                user = DenbotUser.objects.get_or_create_user(phone=phone_number)
-                self.addJWT(user, response)
-
-            return response
-        except TwilioRestException:
-            return Response({"status": "failed"}, status=500)
+        return response
 
 
 class JWTVerificationView(APIView):
