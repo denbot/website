@@ -22,6 +22,7 @@ export default function ThemedLogo() {
       sizes="100vw"
       style={{ width: '80%', height: 'auto', paddingLeft: '10%' }}
       loading="eager"
+      priority
     />
   );
 }

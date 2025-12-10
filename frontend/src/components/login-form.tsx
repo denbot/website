@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { AuthStatus } from '@/models/auth-flow-response.model';
 import { login, loginOtp } from '@/services/authentication';
@@ -28,6 +28,9 @@ export default function LoginForm() {
   const timerRef = useRef<ReturnType<typeof setInterval>>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const phoneNumberRef = useRef<HTMLInputElement>(null);
+  const otpRef = useRef<HTMLInputElement>(null);
 
   const startResendTimer = () => {
     setResendTimer(RESEND_TIMER_LENGTH);
@@ -121,6 +124,26 @@ export default function LoginForm() {
     }
   };
 
+  const handleSubmitOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !isSubmitButtonDisabled()) {
+      submit();
+    }
+  };
+
+  // focus on phone number input when page loads
+  useEffect(() => {
+    if (phoneNumberRef.current) {
+      phoneNumberRef.current.focus();
+    }
+  }, []);
+
+  // focus on otp input when field loads
+  useEffect(() => {
+    if (showOtp && otpRef.current) {
+      otpRef.current.focus();
+    }
+  }, [showOtp]);
+
   return (
     <Stack spacing={2}>
       <ThemedLogo />
@@ -138,6 +161,8 @@ export default function LoginForm() {
         forceCallingCode
         defaultCountry="US"
         disableDropdown
+        inputRef={phoneNumberRef}
+        onKeyDown={handleSubmitOnEnter}
       />
       {showOtp && (
         <TextField
@@ -147,8 +172,11 @@ export default function LoginForm() {
           type="number"
           value={otp}
           onChange={(event) => updateOTP(event.target.value)}
+          inputRef={otpRef}
+          onKeyDown={handleSubmitOnEnter}
         />
       )}
+
       {warningText && (
         <Typography
           variant="body1"
