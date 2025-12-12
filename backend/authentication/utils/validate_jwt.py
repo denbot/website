@@ -25,9 +25,6 @@ def validate_jwt(token: str) -> dict:
             raise ValueError("Token missing user id")
 
         user = DenbotUser.objects.get(id=id)
-        if user is None:
-            raise ValueError("User does not exist")
-
         if not user.is_active:
             raise ValueError("User account not active")
 
@@ -37,3 +34,5 @@ def validate_jwt(token: str) -> dict:
         raise ValueError("Token expired")
     except jwt.InvalidTokenError:
         raise ValueError("Invalid token")
+    except DenbotUser.DoesNotExist:
+        raise ValueError("User Does Not Exist")
