@@ -3,9 +3,7 @@ services:
   frontend:
     container_name: denbot-frontend
     # Build the image from the Dockerfile in the frontend directory
-    build: 
-      context: frontend
-      dockerfile: Dockerfile-dev
+    build: frontend
     # Host the React application on port 3000
     ports:
       - "3000:3000"
