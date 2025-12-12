@@ -43,7 +43,7 @@ class DenbotUserManager(models.Manager):
         return user
 
     def get_by_natural_key(self, primary_key: str) -> "DenbotUser":
-        return self.get(**{self.model.USERNAME_FIELD: primary_key})
+        return self.get(id=primary_key)
 
     def get_or_create_user(self, phone: str) -> "DenbotUser":
         try:
