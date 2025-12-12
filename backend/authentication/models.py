@@ -6,12 +6,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class DenbotUserManager(models.Manager):
-    def create_user(  # noqa: ANN201
+    def create_user(
         self, phone: str, date_of_birth: str = "1900-01-01", id: str = None
-    ):
-        """
-        :rtype: DenbotUser
-        """
+    ) -> "DenbotUser":
         # Create a normal site user.
 
         if id is None:
@@ -29,12 +26,9 @@ class DenbotUserManager(models.Manager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(  # noqa: ANN201
+    def create_superuser(
         self, phone: str, date_of_birth: str = "1900-01-01", id: str = None
-    ):
-        """
-        :rtype: DenbotUser
-        """
+    ) -> "DenbotUser":
         # Create a user that can access the admin panels. This is usually done via
         # command line for development. We call the normal create_user endpoint to
         # de-duplicate field validation.
@@ -48,16 +42,10 @@ class DenbotUserManager(models.Manager):
         user.save(using=self._db)
         return user
 
-    def get_by_natural_key(self, primary_key: str):  # noqa: ANN201
-        """
-        :rtype: DenbotUser
-        """
+    def get_by_natural_key(self, primary_key: str) -> "DenbotUser":
         return self.get(**{self.model.USERNAME_FIELD: primary_key})
 
-    def get_or_create_user(self, phone: str):  # noqa: ANN201
-        """
-        :rtype: DenbotUser
-        """
+    def get_or_create_user(self, phone: str) -> "DenbotUser":
         try:
             return self.get(phone=phone)
         except self.model.DoesNotExist:
