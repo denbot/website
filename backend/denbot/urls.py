@@ -24,5 +24,4 @@ import denbot.views
 urlpatterns = [
     path("", denbot.views.index, name="index"),
     path("api/auth/", include("authentication.urls")),
-    path("admin/", admin.site.urls),
 ]
