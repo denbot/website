@@ -6,30 +6,32 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class DenbotUserManager(models.Manager):
-    def create_user(self, phone, date_of_birth, id=None):
+    def create_user(
+        self, phone: str, date_of_birth: str = "1900-01-01", id: str = None
+    ) -> "DenbotUser":
         # Create a normal site user.
 
         if id is None:
-            # To make it easier in code, we assume we won't get an ID and generate it here. On the command line, the
-            # createsuperuser command had to be overridden to prevent asking the user for this field.
+            # To make it easier in code, we assume we won't get an ID and generate it
+            # here. On the command line, the createsuperuser command had to be
+            # overridden to prevent asking the user for this field.
             id = uuid.uuid4()
         if phone is None:
             raise Exception("User must have a phone number")
         if date_of_birth is None:
             raise Exception("User must have a date of birth")
 
-        user = self.model(
-            id=id,
-            phone=phone,
-            date_of_birth=date_of_birth
-        )
+        user = self.model(id=id, phone=phone, date_of_birth=date_of_birth)
 
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone, date_of_birth, id=None):
-        # Create a user that can access the admin panels. This is usually done via command line for development. We call
-        # the normal create_user endpoint to de-duplicate field validation.
+    def create_superuser(
+        self, phone: str, date_of_birth: str = "1900-01-01", id: str = None
+    ) -> "DenbotUser":
+        # Create a user that can access the admin panels. This is usually done via
+        # command line for development. We call the normal create_user endpoint to
+        # de-duplicate field validation.
 
         user = self.create_user(
             phone=phone,
@@ -40,13 +42,16 @@ class DenbotUserManager(models.Manager):
         user.save(using=self._db)
         return user
 
-    def get_by_natural_key(self, primary_key):
-        """
+    def get_by_natural_key(self, primary_key: str) -> "DenbotUser":
+        return self.get(id=primary_key)
 
+    def get_or_create_user(self, phone: str) -> "DenbotUser":
+        try:
+            return self.get(phone=phone)
+        except self.model.DoesNotExist:
+            user = self.create_user(phone=phone)
+            return user
 
-        :rtype: DenbotUser
-        """
-        return self.get(**{self.model.USERNAME_FIELD: primary_key})
 
 class DenbotUser(models.Model):
     id = models.UUIDField(primary_key=True, unique=True)
@@ -54,9 +59,6 @@ class DenbotUser(models.Model):
 
     phone = PhoneNumberField(unique=True)
     phone_verified = models.BooleanField(default=False)
-
-    login_otp = models.CharField(max_length=10, null=True, blank=True)
-    login_otp_set = models.DateTimeField(_("Login OTP Set Date/Time"), null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -75,7 +77,7 @@ class DenbotUser(models.Model):
         ]
 
     @property
-    def is_anonymous(self):
+    def is_anonymous(self) -> bool:
         """
         Always return False. This is a way of comparing User objects to
         anonymous users.
@@ -83,7 +85,7 @@ class DenbotUser(models.Model):
         return False
 
     @property
-    def is_authenticated(self):
+    def is_authenticated(self) -> bool:
         """
         Always return True. This is a way to tell if the user has been
         authenticated in templates.

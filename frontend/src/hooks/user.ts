@@ -1,11 +1,12 @@
-import { SWRHookReturn } from '@/models/swr-hook-return.model';
-import { getUser } from '@/services/user';
 import { AxiosError } from 'axios';
 import useSWR from 'swr';
 
-function useUser(id: string): SWRHookReturn<string> {
+import { SWRHookReturn } from '@/models/swr-hook-return.model';
+import { getCurrentUser } from '@/services/user';
+
+function useCurrentUser(): SWRHookReturn<string> {
   const { data, error, isLoading } = useSWR<string, AxiosError>('', () =>
-    getUser(id),
+    getCurrentUser(),
   );
 
   return {
@@ -15,4 +16,4 @@ function useUser(id: string): SWRHookReturn<string> {
   };
 }
 
-export { useUser };
+export { useCurrentUser };

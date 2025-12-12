@@ -1,4 +1,4 @@
-export async function getUser(id: string): Promise<string> {
+export async function getCurrentUser(): Promise<string> {
   // TODO get user obj
   return await 'test_user';
 }

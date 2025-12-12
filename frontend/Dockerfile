@@ -16,7 +16,8 @@ COPY . .
 # Set the CHOKIDAR_USEPOLLING environment variable for hot-reloading
 # This is crucial for file watching to work correctly within Docker on some systems
 ENV CHOKIDAR_USEPOLLING=true
-ENV BACKEND_BASE_URL="http://localhost:8000"
+ENV MIDDLEWARE_BACKEND_URL="http://nginx/api"
+ENV NEXT_PUBLIC_BACKEND_URL="http://localhost/api"
 
 # Command to start the React application in development mode
 CMD ["npm", "run", "dev"]

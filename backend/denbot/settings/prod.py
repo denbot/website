@@ -11,3 +11,5 @@ if SECRET_KEY is None:
 DEBUG = False
 
 ALLOWED_HOSTS = ["den.bot"]
+
+USE_TWILIO_AUTH = True
