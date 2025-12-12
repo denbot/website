@@ -84,9 +84,8 @@ class DenbotUser(models.Model):
 
     class Meta:
         indexes = [
-            # We most often key off of the user's phone number and id
+            # We most often key off of the user's phone number
             models.Index(fields=["phone"], name="user_phone_idx"),
-            models.Index(fields=["id"], name="user_id_idx"),
         ]
 
     @property
