@@ -8,10 +8,7 @@ async function login(phoneNumber: string): Promise<AuthStatus> {
   try {
     const { data }: AxiosResponse<{ status: AuthStatus }> =
       await axiosInstance.post('/auth/login', { phoneNumber });
-    if (!!data.status) {
-      return data.status;
-    }
-    return 'error';
+    return data.status ?? 'error';
   } catch {
     return 'error';
   }
@@ -24,10 +21,7 @@ async function loginOtp(phoneNumber: string, otp: string): Promise<AuthStatus> {
         phoneNumber,
         verificationCode: otp,
       });
-    if (!!data.status) {
-      return data.status;
-    }
-    return 'error';
+    return data.status ?? 'error';
   } catch {
     return 'error';
   }
