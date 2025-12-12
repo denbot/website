@@ -4,9 +4,6 @@ services:
     container_name: denbot-frontend
     # Build the image from the Dockerfile in the frontend directory
     build: frontend
-    # Host the React application on port 3000
-    ports:
-      - "3000:3000"
     develop:
     # Create a `watch` configuration to update the app to respond to any changes made
       watch:
@@ -24,9 +21,6 @@ services:
     container_name: denbot-backend
     # Build the image from the Dockerfile in the backend directory
     build: backend
-    # Host the Django application on port 8000
-    ports:
-      - "8000:8000"
     develop:
       # Create a `watch` configuration to update the app to respond to any changes made
       watch:
