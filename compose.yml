@@ -35,6 +35,7 @@ services:
         - action: rebuild
           path: backend/uv.lock
   nginx:
+    container_name: denbot-nginx
     image: nginx:alpine
     ports:
       - "80:80"
