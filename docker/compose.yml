@@ -3,37 +3,41 @@ services:
   frontend:
     container_name: denbot-frontend
     # Build the image from the Dockerfile in the frontend directory
-    build: frontend
+    build: 
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
     develop:
     # Create a `watch` configuration to update the app to respond to any changes made
       watch:
         # Sync the working directory with the `/app` directory in the container
         - action: sync
-          path: frontend
+          path: ../frontend
           target: /app
           # Exclude node modules
           ignore:
-            - frontend/node_modules/
+            - ../frontend/node_modules/
         # Rebuild the image if dependencies change by checking package-lock.json
         - action: rebuild
-          path: frontend/package-lock.json
+          path: ../frontend/package-lock.json
   backend:
     container_name: denbot-backend
     # Build the image from the Dockerfile in the backend directory
-    build: backend
+    build: 
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
     develop:
       # Create a `watch` configuration to update the app to respond to any changes made
       watch:
         # Sync the working directory with the `/app` directory in the container
         - action: sync
-          path: backend
+          path: ../backend
           target: /app
           # Exclude the project virtual environment
           ignore:
-            - backend/.venv/
+            - ../backend/.venv/
         # Rebuild the image if dependencies change by checking uv.lock
         - action: rebuild
-          path: backend/uv.lock
+          path: ../backend/uv.lock
   nginx:
     container_name: denbot-nginx
     image: nginx:alpine
