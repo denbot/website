@@ -2,6 +2,8 @@ from django.conf import settings
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
+from authentication.enums import AuthStatus
+
 
 class TwilioAuth:
     def __init__(self) -> None:
@@ -11,21 +13,21 @@ class TwilioAuth:
         self.service_sid = settings.TWILIO_SERVICE_SID
         self.client = Client(self.api_key, self.api_secret, self.account_sid)
 
-    def send_code(self, phone_number: str) -> str:
+    def send_code(self, phone_number: str) -> AuthStatus:
         try:
             twilio_response = self.client.verify.v2.services(
                 self.service_sid
             ).verifications.create(to=phone_number, channel="sms")
             if twilio_response.status == "pending":
-                return "created"
+                return AuthStatus.CREATED
 
         except TwilioRestException as error:
             if error.status == 429:
-                return "too_many_attempts"
+                return AuthStatus.TOO_MANY_ATTEMPTS
 
-        return "error"
+        return AuthStatus.ERROR
 
-    def verify_code(self, phone_number: str, verification_code: str) -> str:
+    def verify_code(self, phone_number: str, verification_code: str) -> AuthStatus:
         try:
             twilio_response = self.client.verify.v2.services(
                 self.service_sid
@@ -33,18 +35,18 @@ class TwilioAuth:
 
             match twilio_response.status:
                 case "approved":
-                    return "approved"
+                    return AuthStatus.APPROVED
                 case "pending":
-                    return "failed"
+                    return AuthStatus.FAILED
                 case "max_attempts_reached":
                     self.try_twilio_auth_create(phone_number)
-                    return "expired"
+                    return AuthStatus.EXPIRED
                 case "expired":
                     self.try_twilio_auth_create(phone_number)
                     return "expired"
 
         except TwilioRestException as error:
             if error.status == 429:
-                return "too_many_attempts"
+                return AuthStatus.TOO_MANY_ATTEMPTS
 
-        return "error"
+        return AuthStatus.ERROR
