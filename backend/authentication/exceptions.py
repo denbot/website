@@ -14,24 +14,30 @@ class UserError(JWTValidationError):
 
 
 class MissingUserIdError(TokenError):
-    pass
+    def __str__() -> str:
+        return "Token missing user ID."
 
 
 class AccountInactiveError(UserError):
-    pass
+    def __str__(self) -> str:
+        return "User account inactive. ID: ${self.user_id}."
 
 
 class TokenExpiredError(TokenError):
-    pass
+    def __str__() -> str:
+        return "Token expired."
 
 
 class InvalidTokenError(TokenError):
-    pass
+    def __str__() -> str:
+        return "Token invalid."
 
 
 class UserDoesNotExistError(UserError):
-    pass
+    def __str__(self) -> str:
+        return "User does not exist. ID: ${self.user_id}."
 
 
 class NoTokenProvidedError(TokenError):
-    pass
+    def __str__() -> str:
+        return "No token provided."
