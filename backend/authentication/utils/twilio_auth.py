@@ -12,25 +12,20 @@ class TwilioAuth:
         self.client = Client(self.api_key, self.api_secret, self.account_sid)
 
     def send_code(self, phone_number: str) -> str:
-        status = "error"
         try:
             twilio_response = self.client.verify.v2.services(
                 self.service_sid
             ).verifications.create(to=phone_number, channel="sms")
-            match twilio_response.status:
-                case "pending":
-                    status = "created"
-                case _:
-                    status = "error"
+            if twilio_response.status == "pending":
+                return "created"
+
         except TwilioRestException as error:
             if error.status == 429:
-                status = "too_many_attempts"
-            else:
-                status = "error"
-        return status
+                return "too_many_attempts"
+
+        return "error"
 
     def verify_code(self, phone_number: str, verification_code: str) -> str:
-        status = "error"
         try:
             twilio_response = self.client.verify.v2.services(
                 self.service_sid
@@ -38,21 +33,18 @@ class TwilioAuth:
 
             match twilio_response.status:
                 case "approved":
-                    status = "approved"
+                    return "approved"
                 case "pending":
-                    status = "failed"
+                    return "failed"
                 case "max_attempts_reached":
                     self.try_twilio_auth_create(phone_number)
-                    status = "expired"
+                    return "expired"
                 case "expired":
                     self.try_twilio_auth_create(phone_number)
-                    status = "expired"
-                case _:
-                    status = "error"
+                    return "expired"
 
         except TwilioRestException as error:
             if error.status == 429:
-                status = "too_many_attempts"
-            else:
-                status = "error"
-        return status
+                return "too_many_attempts"
+
+        return "error"
