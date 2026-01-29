@@ -26,5 +26,9 @@ class InvalidTokenError(TokenError):
     pass
 
 
-class UserDoesNotExist(UserError):
+class UserDoesNotExistError(UserError):
+    pass
+
+
+class NoTokenProvidedError(TokenError):
     pass
