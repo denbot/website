@@ -7,7 +7,10 @@ class TokenError(JWTValidationError):
 
 
 class UserError(JWTValidationError):
-    pass
+    user_id: str = None
+
+    def __init__(self, id: str) -> None:
+        self.user_id = id
 
 
 class MissingUserIdError(TokenError):
