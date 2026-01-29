@@ -1,30 +1,31 @@
 import jwt
 from django.conf import settings
 
+import authentication.exceptions as jwtExceptions
 from authentication.models import DenbotUser
 
 
 def validate_jwt(token: str) -> dict:
     """Return payload if valid, else raise exception"""
     if not token:
-        raise ValueError("No token provided")
+        raise jwtExceptions.NoTokenProvidedError
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
 
         id = payload.get("user_id")
         if id is None:
-            raise ValueError("Token missing user id")
+            raise jwtExceptions.MissingUserIdError
 
         user = DenbotUser.objects.get(id=id)
         if not user.is_active:
-            raise ValueError("User account not active")
+            raise jwtExceptions.AccountInactiveError(id)
 
         return payload
 
     except jwt.ExpiredSignatureError:
-        raise ValueError("Token expired")
+        raise jwtExceptions.TokenExpiredError
     except jwt.InvalidTokenError:
-        raise ValueError("Invalid token")
+        raise jwtExceptions.InvalidTokenError
     except DenbotUser.DoesNotExist:
-        raise ValueError("User Does Not Exist")
+        raise jwtExceptions.UserDoesNotExistError(id)
