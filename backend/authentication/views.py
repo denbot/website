@@ -7,11 +7,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.models import DenbotUser
-from authentication.utils.twilio_auth import (
-    try_twilio_auth_create,
-    try_twilio_auth_verify,
-)
+from authentication.utils.twilio_auth import TwilioAuth
 from authentication.utils.validate_jwt import validate_jwt
+
+auth = TwilioAuth()
 
 
 class LoginAPIView(APIView):
@@ -20,7 +19,7 @@ class LoginAPIView(APIView):
         if not settings.USE_TWILIO_AUTH:
             return Response({"status": "created"})
         # don't create user here, wait until they have verified.
-        status = try_twilio_auth_create(phone_number)
+        status = auth.send_code(phone_number)
         if status != "error":
             return Response({"status": status})
         else:
@@ -54,7 +53,7 @@ class LoginOtpAPIView(APIView):
         if not settings.USE_TWILIO_AUTH:
             status = "approved" if verification_code == settings.DEV_OTP else "failed"
         else:
-            status = try_twilio_auth_verify(phone_number, verification_code)
+            status = auth.verify_code(phone_number, verification_code)
 
         response = Response({"status": status})
 
