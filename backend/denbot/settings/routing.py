@@ -26,7 +26,7 @@ elif env == "prod":
 else:
     raise Exception(f"Unknown environment {env}")
 
-# TODO: change in #6
+# TODO: change in #7
 TWILIO_API_KEY = os.environ.get("TWILIO_API_KEY")
 TWILIO_API_SECRET = os.environ.get("TWILIO_API_SECRET")
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
