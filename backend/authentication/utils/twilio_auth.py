@@ -1,8 +1,17 @@
+from enum import Enum
+
 from django.conf import settings
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
 from authentication.enums import AuthStatus
+
+
+class TwilioResponse(Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    MAX_ATTEMPTS_REACHED = "max_attempts_reached"
+    EXPIRED = "expired"
 
 
 class TwilioAuth:
@@ -18,7 +27,7 @@ class TwilioAuth:
             twilio_response = self.client.verify.v2.services(
                 self.service_sid
             ).verifications.create(to=phone_number, channel="sms")
-            if twilio_response.status == "pending":
+            if twilio_response.status == TwilioResponse.PENDING:
                 return AuthStatus.CREATED
 
         except TwilioRestException as error:
@@ -34,16 +43,16 @@ class TwilioAuth:
             ).verification_checks.create(to=phone_number, code=verification_code)
 
             match twilio_response.status:
-                case "approved":
+                case TwilioResponse.APPROVED:
                     return AuthStatus.APPROVED
-                case "pending":
+                case TwilioResponse.PENDING:
                     return AuthStatus.FAILED
-                case "max_attempts_reached":
+                case TwilioResponse.MAX_ATTEMPTS_REACHED:
                     self.try_twilio_auth_create(phone_number)
                     return AuthStatus.EXPIRED
-                case "expired":
+                case TwilioResponse.EXPIRED:
                     self.try_twilio_auth_create(phone_number)
-                    return "expired"
+                    return AuthStatus.EXPIRED
 
         except TwilioRestException as error:
             if error.status == 429:
