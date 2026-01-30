@@ -8,10 +8,13 @@ from authentication.enums import AuthStatus
 
 
 class TwilioResponse(Enum):
-    PENDING = "pending"
     APPROVED = "approved"
-    MAX_ATTEMPTS_REACHED = "max_attempts_reached"
+    CANCELED = "canceled"
+    DELETED = "deleted"
+    FAILED = "failed"
     EXPIRED = "expired"
+    MAX_ATTEMPTS_REACHED = "max_attempts_reached"
+    PENDING = "pending"
 
 
 class TwilioAuth:
