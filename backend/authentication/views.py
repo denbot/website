@@ -6,6 +6,7 @@ from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from authentication.enums import AuthStatus
 from authentication.models import DenbotUser
 from authentication.utils.twilio_auth import TwilioAuth
 from authentication.utils.validate_jwt import validate_jwt
@@ -49,17 +50,21 @@ class LoginOtpAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
-        status = "error"
+        status = AuthStatus.ERROR
         if not settings.USE_TWILIO_AUTH:
-            status = "approved" if verification_code == settings.DEV_OTP else "failed"
+            status = (
+                AuthStatus.APPROVED
+                if verification_code == settings.DEV_OTP
+                else AuthStatus.FAILED
+            )
         else:
             status = auth.verify_code(phone_number, verification_code)
 
         response = Response({"status": status})
 
-        if status == "error":
-            response = Response({"status": status}, status=500)
-        if status == "approved":
+        if status == AuthStatus.ERROR:
+            response.status_code = 500
+        if status == AuthStatus.APPROVED:
             user = DenbotUser.objects.get_or_create_user(phone=phone_number)
             self.addJWT(user, response)
 
