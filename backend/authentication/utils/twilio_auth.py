@@ -1,58 +1,64 @@
-import os
+from enum import Enum
 
+from django.conf import settings
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
-api_key = os.environ["TWILIO_API_KEY"]
-api_secret = os.environ["TWILIO_API_SECRET"]
-account_sid = os.environ["TWILIO_ACCOUNT_SID"]
-service_sid = os.environ["TWILIO_SERVICE_SID"]
-client = Client(api_key, api_secret, account_sid)
+from authentication.enums import AuthStatus
 
 
-def try_twilio_auth_create(phone_number: str) -> str:
-    status = "error"
-    try:
-        twilio_response = client.verify.v2.services(service_sid).verifications.create(
-            to=phone_number, channel="sms"
-        )
-        match twilio_response.status:
-            case "pending":
-                status = "created"
-            case _:
-                status = "error"
-    except TwilioRestException as error:
-        if error.status == 429:
-            status = "too_many_attempts"
-        else:
-            status = "error"
-    return status
+class TwilioResponse(Enum):
+    APPROVED = "approved"
+    CANCELED = "canceled"
+    DELETED = "deleted"
+    FAILED = "failed"
+    EXPIRED = "expired"
+    MAX_ATTEMPTS_REACHED = "max_attempts_reached"
+    PENDING = "pending"
 
 
-def try_twilio_auth_verify(phone_number: str, verification_code: str) -> str:
-    status = "error"
-    try:
-        twilio_response = client.verify.v2.services(
-            service_sid
-        ).verification_checks.create(to=phone_number, code=verification_code)
+class TwilioAuth:
+    def __init__(self) -> None:
+        self.api_key = settings.TWILIO_API_KEY
+        self.api_secret = settings.TWILIO_API_SECRET
+        self.account_sid = settings.TWILIO_ACCOUNT_SID
+        self.service_sid = settings.TWILIO_SERVICE_SID
+        self.client = Client(self.api_key, self.api_secret, self.account_sid)
 
-        match twilio_response.status:
-            case "approved":
-                status = "approved"
-            case "pending":
-                status = "failed"
-            case "max_attempts_reached":
-                try_twilio_auth_create(phone_number)
-                status = "expired"
-            case "expired":
-                try_twilio_auth_create(phone_number)
-                status = "expired"
-            case _:
-                status = "error"
+    def send_code(self, phone_number: str) -> AuthStatus:
+        try:
+            twilio_response = self.client.verify.v2.services(
+                self.service_sid
+            ).verifications.create(to=phone_number, channel="sms")
+            if twilio_response.status == TwilioResponse.PENDING:
+                return AuthStatus.CREATED
 
-    except TwilioRestException as error:
-        if error.status == 429:
-            status = "too_many_attempts"
-        else:
-            status = "error"
-    return status
+        except TwilioRestException as error:
+            if error.status == 429:
+                return AuthStatus.TOO_MANY_ATTEMPTS
+
+        return AuthStatus.ERROR
+
+    def verify_code(self, phone_number: str, verification_code: str) -> AuthStatus:
+        try:
+            twilio_response = self.client.verify.v2.services(
+                self.service_sid
+            ).verification_checks.create(to=phone_number, code=verification_code)
+
+            match twilio_response.status:
+                case TwilioResponse.APPROVED:
+                    return AuthStatus.APPROVED
+                case TwilioResponse.PENDING:
+                    return AuthStatus.FAILED
+                case TwilioResponse.MAX_ATTEMPTS_REACHED:
+                    self.try_twilio_auth_create(phone_number)
+                    return AuthStatus.EXPIRED
+                case TwilioResponse.EXPIRED:
+                    self.try_twilio_auth_create(phone_number)
+                    return AuthStatus.EXPIRED
+
+        except TwilioRestException as error:
+            if error.status == 429:
+                return AuthStatus.TOO_MANY_ATTEMPTS
+
+        return AuthStatus.ERROR
