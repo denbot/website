@@ -1,6 +1,5 @@
 from enum import Enum
 
-from django.conf import settings
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 
@@ -19,11 +18,13 @@ class TwilioResponse(Enum):
 
 
 class TwilioAuth(AuthSupplier):
-    def __init__(self) -> None:
-        self.api_key = settings.TWILIO_API_KEY
-        self.api_secret = settings.TWILIO_API_SECRET
-        self.account_sid = settings.TWILIO_ACCOUNT_SID
-        self.service_sid = settings.TWILIO_SERVICE_SID
+    def __init__(
+        self, api_key: str, api_secret: str, account_sid: str, service_sid: str
+    ) -> None:
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.account_sid = account_sid
+        self.service_sid = service_sid
         self.client = Client(self.api_key, self.api_secret, self.account_sid)
 
     def send_code(self, phone_number: str) -> AuthStatus:
@@ -52,10 +53,10 @@ class TwilioAuth(AuthSupplier):
                 case TwilioResponse.PENDING:
                     return AuthStatus.FAILED
                 case TwilioResponse.MAX_ATTEMPTS_REACHED:
-                    self.try_twilio_auth_create(phone_number)
+                    self.send_code(phone_number)
                     return AuthStatus.EXPIRED
                 case TwilioResponse.EXPIRED:
-                    self.try_twilio_auth_create(phone_number)
+                    self.send_code(phone_number)
                     return AuthStatus.EXPIRED
 
         except TwilioRestException as error:
