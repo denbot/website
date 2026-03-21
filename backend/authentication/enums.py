@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class AuthStatus(Enum):
+class AuthStatus(str, Enum):
     APPROVED = "approved"
     CREATED = "created"
     ERROR = "error"

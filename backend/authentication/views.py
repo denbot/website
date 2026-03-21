@@ -19,10 +19,10 @@ class LoginAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         if not settings.USE_TWILIO_AUTH:
-            return Response({"status": "created"})
+            return Response({"status": AuthStatus.CREATED})
         # don't create user here, wait until they have verified.
         status = auth.send_code(phone_number)
-        if status != "error":
+        if status != AuthStatus.ERROR:
             return Response({"status": status})
         else:
             return Response({"status": status}, status=500)
