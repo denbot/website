@@ -13,3 +13,9 @@ DEBUG = False
 ALLOWED_HOSTS = ["den.bot"]
 
 USE_TWILIO_AUTH = True
+
+# TODO: change in #7
+TWILIO_API_KEY = os.environ.get("TWILIO_API_KEY")
+TWILIO_API_SECRET = os.environ.get("TWILIO_API_SECRET")
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_SERVICE_SID = os.environ.get("TWILIO_SERVICE_SID")
