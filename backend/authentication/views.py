@@ -6,6 +6,7 @@ from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from authentication.exceptions import JWTValidationError
 from authentication.models import DenbotUser
 from authentication.utils.twilio_auth import (
     try_twilio_auth_create,
@@ -73,5 +74,5 @@ class JWTVerificationView(APIView):
         try:
             payload = validate_jwt(token)
             return Response({"valid": True, "user_id": payload.get("user_id")})
-        except ValueError as e:
+        except JWTValidationError as e:
             return Response({"valid": False, "reason": str(e)}, status=401)
