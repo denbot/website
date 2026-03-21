@@ -6,4 +6,10 @@ SECRET_KEY = "django-insecure-r5u$w6!mrp&95#k=tvr3djpq=8)hkp_u6!rt3)2l0_z7%twpw^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-USE_TWILIO_AUTH = True
+# TODO: Change in #7
+USE_TWILIO_AUTH = False
+DEV_OTP = "009586"
+TWILIO_API_KEY = ""
+TWILIO_API_SECRET = ""
+TWILIO_ACCOUNT_SID = ""
+TWILIO_SERVICE_SID = ""

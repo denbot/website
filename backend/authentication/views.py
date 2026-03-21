@@ -6,23 +6,23 @@ from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from authentication.enums import AuthStatus
 from authentication.exceptions import JWTValidationError
 from authentication.models import DenbotUser
-from authentication.utils.twilio_auth import (
-    try_twilio_auth_create,
-    try_twilio_auth_verify,
-)
+from authentication.utils.twilio_auth import TwilioAuth
 from authentication.utils.validate_jwt import validate_jwt
+
+auth = TwilioAuth()
 
 
 class LoginAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         if not settings.USE_TWILIO_AUTH:
-            return Response({"status": "created"})
+            return Response({"status": AuthStatus.CREATED})
         # don't create user here, wait until they have verified.
-        status = try_twilio_auth_create(phone_number)
-        if status != "error":
+        status = auth.send_code(phone_number)
+        if status != AuthStatus.ERROR:
             return Response({"status": status})
         else:
             return Response({"status": status}, status=500)
@@ -51,17 +51,21 @@ class LoginOtpAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
-        status = "error"
+        status = AuthStatus.ERROR
         if not settings.USE_TWILIO_AUTH:
-            status = "approved" if verification_code == settings.DEV_OTP else "failed"
+            status = (
+                AuthStatus.APPROVED
+                if verification_code == settings.DEV_OTP
+                else AuthStatus.FAILED
+            )
         else:
-            status = try_twilio_auth_verify(phone_number, verification_code)
+            status = auth.verify_code(phone_number, verification_code)
 
         response = Response({"status": status})
 
-        if status == "error":
-            response = Response({"status": status}, status=500)
-        if status == "approved":
+        if status == AuthStatus.ERROR:
+            response.status_code = 500
+        if status == AuthStatus.APPROVED:
             user = DenbotUser.objects.get_or_create_user(phone=phone_number)
             self.addJWT(user, response)
 
