@@ -9,19 +9,15 @@ from rest_framework.views import APIView
 from authentication.enums import AuthStatus
 from authentication.exceptions import JWTValidationError
 from authentication.models import DenbotUser
-from authentication.utils.twilio_auth import TwilioAuth
+from authentication.utils.auth import Auth
 from authentication.utils.validate_jwt import validate_jwt
-
-auth = TwilioAuth()
 
 
 class LoginAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
-        if not settings.USE_TWILIO_AUTH:
-            return Response({"status": AuthStatus.CREATED})
         # don't create user here, wait until they have verified.
-        status = auth.send_code(phone_number)
+        status = Auth.send_code(phone_number)
         if status != AuthStatus.ERROR:
             return Response({"status": status})
         else:
@@ -51,21 +47,14 @@ class LoginOtpAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
-        status = AuthStatus.ERROR
-        if not settings.USE_TWILIO_AUTH:
-            status = (
-                AuthStatus.APPROVED
-                if verification_code == settings.DEV_OTP
-                else AuthStatus.FAILED
-            )
-        else:
-            status = auth.verify_code(phone_number, verification_code)
+        status = Auth.verify_code(phone_number, verification_code)
 
         response = Response({"status": status})
 
         if status == AuthStatus.ERROR:
             response.status_code = 500
         if status == AuthStatus.APPROVED:
+            # TODO: Don't create user here, should be a separate path for that
             user = DenbotUser.objects.get_or_create_user(phone=phone_number)
             self.addJWT(user, response)
 

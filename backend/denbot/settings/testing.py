@@ -6,10 +6,13 @@ SECRET_KEY = "django-insecure-r5u$w6!mrp&95#k=tvr3djpq=8)hkp_u6!rt3)2l0_z7%twpw^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# TODO: Change in #7
-USE_TWILIO_AUTH = False
-DEV_OTP = "009586"
-TWILIO_API_KEY = ""
-TWILIO_API_SECRET = ""
-TWILIO_ACCOUNT_SID = ""
-TWILIO_SERVICE_SID = ""
+AUTH_SUPPLIER = {
+    "PATH": "authentication.auth_suppliers.dev_auth_supplier.DevAuthSupplier",
+    "OPTIONS": {
+        "phone_ending_attempts": "429",
+        "approve_code": "009586",
+        "failed_code": "500500",
+        "expired_code": "000000",
+        "too_many_attempts_code": "429429",
+    },
+}
