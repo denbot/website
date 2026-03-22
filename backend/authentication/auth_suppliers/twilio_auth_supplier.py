@@ -49,7 +49,7 @@ class TwilioAuthSupplier(AuthSupplier):
             twilio_response = self.client.verify.v2.services(
                 self._service_sid
             ).verifications.create(to=phone_number, channel="sms")
-            if twilio_response.status == TwilioResponse.PENDING:
+            if twilio_response.status == TwilioResponse.PENDING.value:
                 return AuthStatus.CREATED
 
         except TwilioRestException as error:
@@ -64,7 +64,7 @@ class TwilioAuthSupplier(AuthSupplier):
                 self._service_sid
             ).verification_checks.create(to=phone_number, code=verification_code)
 
-            match twilio_response.status:
+            match TwilioResponse(twilio_response.status):
                 case TwilioResponse.APPROVED:
                     return AuthStatus.APPROVED
                 case TwilioResponse.PENDING:

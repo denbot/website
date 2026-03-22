@@ -4,8 +4,8 @@ from authentication.enums import AuthStatus
 
 
 class AuthSupplier(ABC):
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def from_settings(cls, options: dict) -> "AuthSupplier":
         pass
 
