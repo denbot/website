@@ -7,8 +7,6 @@ class TokenError(JWTValidationError):
 
 
 class UserError(JWTValidationError):
-    user_id: str = None
-
     def __init__(self, id: str) -> None:
         self.user_id = id
 
@@ -41,3 +39,41 @@ class UserDoesNotExistError(UserError):
 class NoTokenProvidedError(TokenError):
     def __str__() -> str:
         return "No token provided."
+
+
+class AuthImproperlyConfiguredError(Exception):
+    pass
+
+
+class NoConfigurationSuppliedError(AuthImproperlyConfiguredError):
+    def __str__() -> str:
+        return "AUTH_SUPPLIER is not configured"
+
+
+class NoPathSuppliedError(AuthImproperlyConfiguredError):
+    def __str__() -> str:
+        return "AUTH_SUPPLIER['PATH'] is required"
+
+
+class BadPathSuppliedError(AuthImproperlyConfiguredError):
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+
+class PathDoesNotExistError(BadPathSuppliedError):
+    def __str__() -> str:
+        return "${self.path} is not a valid class path"
+
+
+class PathIsNotAuthSupplierError(BadPathSuppliedError):
+    def __str__() -> str:
+        return "${self.path} is not an implementation of AuthSupplier"
+
+
+class InvalidConfigError(AuthImproperlyConfiguredError):
+    def __init__(self, classname: str, error: str) -> None:
+        self.classname = classname
+        self.error = error
+
+    def __str__() -> str:
+        return "Invalid ${self.classname} config: ${self.error}"

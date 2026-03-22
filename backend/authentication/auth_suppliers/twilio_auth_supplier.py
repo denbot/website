@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 from twilio.base.exceptions import TwilioRestException
@@ -5,6 +6,7 @@ from twilio.rest import Client
 
 from authentication.auth_suppliers.auth_supplier import AuthSupplier
 from authentication.enums import AuthStatus
+from authentication.exceptions import InvalidConfigError
 
 
 class TwilioResponse(Enum):
@@ -17,15 +19,30 @@ class TwilioResponse(Enum):
     PENDING = "pending"
 
 
-class TwilioAuth(AuthSupplier):
-    def __init__(
-        self, api_key: str, api_secret: str, account_sid: str, service_sid: str
-    ) -> None:
-        self._api_key = api_key
-        self._api_secret = api_secret
-        self._account_sid = account_sid
-        self._service_sid = service_sid
+@dataclass
+class TwilioAuthConfig:
+    api_key: str
+    api_secret: str
+    account_sid: str
+    service_sid: str
+
+
+class TwilioAuthSupplier(AuthSupplier):
+    def __init__(self, config: TwilioAuthConfig) -> None:
+        self._api_key = config.api_key
+        self._api_secret = config.api_secret
+        self._account_sid = config.account_sid
+        self._service_sid = config.service_sid
         self.client = Client(self._api_key, self._api_secret, self._account_sid)
+
+    @classmethod
+    def from_settings(cls, options: dict) -> "TwilioAuthSupplier":
+        try:
+            config = TwilioAuthConfig(**options)
+        except TypeError as e:
+            raise InvalidConfigError(cls.__name__, e)
+
+        return cls(config)
 
     def send_code(self, phone_number: str) -> AuthStatus:
         try:
