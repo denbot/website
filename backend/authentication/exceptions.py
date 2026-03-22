@@ -12,7 +12,7 @@ class UserError(JWTValidationError):
 
 
 class MissingUserIdError(TokenError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "Token missing user ID."
 
 
@@ -22,12 +22,12 @@ class AccountInactiveError(UserError):
 
 
 class TokenExpiredError(TokenError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "Token expired."
 
 
 class InvalidTokenError(TokenError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "Token invalid."
 
 
@@ -37,7 +37,7 @@ class UserDoesNotExistError(UserError):
 
 
 class NoTokenProvidedError(TokenError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "No token provided."
 
 
@@ -46,12 +46,12 @@ class AuthImproperlyConfiguredError(Exception):
 
 
 class NoConfigurationSuppliedError(AuthImproperlyConfiguredError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "AUTH_SUPPLIER is not configured"
 
 
 class NoPathSuppliedError(AuthImproperlyConfiguredError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "AUTH_SUPPLIER['PATH'] is required"
 
 
@@ -61,12 +61,12 @@ class BadPathSuppliedError(AuthImproperlyConfiguredError):
 
 
 class PathDoesNotExistError(BadPathSuppliedError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "${self.path} is not a valid class path"
 
 
 class PathIsNotAuthSupplierError(BadPathSuppliedError):
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "${self.path} is not an implementation of AuthSupplier"
 
 
@@ -75,5 +75,5 @@ class InvalidConfigError(AuthImproperlyConfiguredError):
         self.classname = classname
         self.error = error
 
-    def __str__() -> str:
+    def __str__(self) -> str:
         return "Invalid ${self.classname} config: ${self.error}"

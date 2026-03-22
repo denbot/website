@@ -5,11 +5,11 @@ from authentication.enums import AuthStatus
 from authentication.exceptions import InvalidConfigError
 
 
-@dataclass
+@dataclass(frozen=True)
 class DevAuthConfig:
     phone_ending_attempts: str = "429"
     approve_code: str = "009586"
-    failed_code: str = "500500"
+    error_code: str = "500500"
     expired_code: str = "000000"
     too_many_attempts_code: str = "429429"
 
@@ -18,7 +18,7 @@ class DevAuthSupplier(AuthSupplier):
     def __init__(self, config: DevAuthConfig) -> None:
         self._phone_ending_attempts = config.phone_ending_attempts
         self._approve_code = config.approve_code
-        self._failed_code = config.failed_code
+        self._error_code = config.error_code
         self._expired_code = config.expired_code
         self._too_many_attempts_code = config.too_many_attempts_code
 
@@ -40,11 +40,11 @@ class DevAuthSupplier(AuthSupplier):
         match verification_code:
             case self._approve_code:
                 return AuthStatus.APPROVED
-            case self._failed_code:
-                return AuthStatus.FAILED
+            case self._error_code:
+                return AuthStatus.ERROR
             case self._expired_code:
                 return AuthStatus.EXPIRED
             case self._too_many_attempts_code:
                 return AuthStatus.TOO_MANY_ATTEMPTS
             case _:
-                return AuthStatus.ERROR
+                return AuthStatus.FAILED

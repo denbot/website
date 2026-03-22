@@ -8,11 +8,4 @@ DEBUG = True
 
 AUTH_SUPPLIER = {
     "PATH": "authentication.auth_suppliers.dev_auth_supplier.DevAuthSupplier",
-    "OPTIONS": {
-        "phone_ending_attempts": "429",
-        "approve_code": "009586",
-        "failed_code": "500500",
-        "expired_code": "000000",
-        "too_many_attempts_code": "429429",
-    },
 }

@@ -19,7 +19,7 @@ class TwilioResponse(Enum):
     PENDING = "pending"
 
 
-@dataclass
+@dataclass(frozen=True)
 class TwilioAuthConfig:
     api_key: str
     api_secret: str
