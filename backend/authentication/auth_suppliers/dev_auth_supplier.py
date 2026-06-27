@@ -7,8 +7,8 @@ from authentication.exceptions import InvalidConfigError
 
 @dataclass(frozen=True)
 class DevAuthConfig:
-    phone_ending_attempts: str = "429"
-    approve_code: str = "009586"
+    phone_ending_too_many_attempts: str = "429"
+    approve_code: str = "336268"
     error_code: str = "500500"
     expired_code: str = "000000"
     too_many_attempts_code: str = "429429"
@@ -16,7 +16,7 @@ class DevAuthConfig:
 
 class DevAuthSupplier(AuthSupplier):
     def __init__(self, config: DevAuthConfig) -> None:
-        self._phone_ending_attempts = config.phone_ending_attempts
+        self._phone_ending_too_many_attempts = config.phone_ending_too_many_attempts
         self._approve_code = config.approve_code
         self._error_code = config.error_code
         self._expired_code = config.expired_code
@@ -32,7 +32,7 @@ class DevAuthSupplier(AuthSupplier):
         return cls(config)
 
     def send_code(self, phone_number: str) -> AuthStatus:
-        if phone_number.endswith(self._phone_ending_attempts):
+        if phone_number.endswith(self._phone_ending_too_many_attempts):
             return AuthStatus.TOO_MANY_ATTEMPTS
         return AuthStatus.CREATED
 

@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from enum import Enum
 
@@ -30,10 +29,10 @@ class TwilioAuthConfig:
 
 class TwilioAuthSupplier(AuthSupplier):
     def __init__(self, config: TwilioAuthConfig) -> None:
-        self._api_key = os.environ.get(config.api_key)
-        self._api_secret = os.environ.get(config.api_secret)
-        self._account_sid = os.environ.get(config.account_sid)
-        self._service_sid = os.environ.get(config.service_sid)
+        self._api_key = config.api_key
+        self._api_secret = config.api_secret
+        self._account_sid = config.account_sid
+        self._service_sid = config.service_sid
         self.client = Client(self._api_key, self._api_secret, self._account_sid)
 
     @classmethod

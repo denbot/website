@@ -4,10 +4,10 @@ from django.utils.module_loading import import_string
 from authentication.auth_suppliers.auth_supplier import AuthSupplier
 from authentication.enums import AuthStatus
 from authentication.exceptions import (
-    NoConfigurationSuppliedError,
-    NoPathSuppliedError,
-    PathDoesNotExistError,
-    PathIsNotAuthSupplierError,
+    AuthSupplierUnspecifiedError,
+    NoBackendSuppliedError,
+    BackendDoesNotExistError,
+    BackendIsNotAuthSupplierError,
 )
 
 
@@ -22,21 +22,21 @@ class Auth:
         config = getattr(settings, "AUTH_SUPPLIER", None)
 
         if not config:
-            raise NoConfigurationSuppliedError
+            raise AuthSupplierUnspecifiedError
 
-        backend_path = config.get("PATH")
+        backend_path = config.get("BACKEND")
         options = config.get("OPTIONS", {})
 
         if not backend_path:
-            raise NoPathSuppliedError
+            raise NoBackendSuppliedError
 
         try:
             cls = import_string(backend_path)
         except ImportError:
-            raise PathDoesNotExistError(backend_path)
+            raise BackendDoesNotExistError(backend_path)
 
         if not issubclass(cls, AuthSupplier):
-            raise PathIsNotAuthSupplierError(backend_path)
+            raise BackendIsNotAuthSupplierError(backend_path)
 
         return cls.from_settings(options)
 

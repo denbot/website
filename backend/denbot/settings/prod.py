@@ -13,11 +13,11 @@ DEBUG = False
 ALLOWED_HOSTS = ["den.bot"]
 
 AUTH_SUPPLIER = {
-    "PATH": "authentication.auth_suppliers.twilio_auth_supplier.TwilioAuthSupplier",
+    "BACKEND": "authentication.auth_suppliers.twilio_auth_supplier.TwilioAuthSupplier",
     "OPTIONS": {
-        "api_key": "TWILIO_API_KEY",
-        "api_secret": "TWILIO_API_SECRET",
-        "account_sid": "TWILIO_ACCOUNT_SID",
-        "service_sid": "TWILIO_SERVICE_SID",
+        "api_key": os.environ.get("TWILIO_API_KEY"),
+        "api_secret": os.environ.get("TWILIO_API_SECRET"),
+        "account_sid": os.environ.get("TWILIO_ACCOUNT_SID"),
+        "service_sid": os.environ.get("TWILIO_SERVICE_SID"),
     },
 }

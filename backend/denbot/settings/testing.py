@@ -7,5 +7,5 @@ SECRET_KEY = "django-insecure-r5u$w6!mrp&95#k=tvr3djpq=8)hkp_u6!rt3)2l0_z7%twpw^
 DEBUG = True
 
 AUTH_SUPPLIER = {
-    "PATH": "authentication.auth_suppliers.dev_auth_supplier.DevAuthSupplier",
+    "BACKEND": "authentication.auth_suppliers.dev_auth_supplier.DevAuthSupplier",
 }

@@ -45,29 +45,29 @@ class AuthImproperlyConfiguredError(Exception):
     pass
 
 
-class NoConfigurationSuppliedError(AuthImproperlyConfiguredError):
+class AuthSupplierUnspecifiedError(AuthImproperlyConfiguredError):
     def __str__(self) -> str:
-        return "AUTH_SUPPLIER is not configured"
+        return "AUTH_SUPPLIER is not configured in the settings"
 
 
-class NoPathSuppliedError(AuthImproperlyConfiguredError):
+class NoBackendSuppliedError(AuthImproperlyConfiguredError):
     def __str__(self) -> str:
-        return "AUTH_SUPPLIER['PATH'] is required"
+        return "AUTH_SUPPLIER['BACKEND'] is required"
 
 
-class BadPathSuppliedError(AuthImproperlyConfiguredError):
-    def __init__(self, path: str) -> None:
-        self.path = path
+class BadBackendSuppliedError(AuthImproperlyConfiguredError):
+    def __init__(self, backend: str) -> None:
+        self.backend = backend
 
 
-class PathDoesNotExistError(BadPathSuppliedError):
+class BackendDoesNotExistError(BadBackendSuppliedError):
     def __str__(self) -> str:
-        return "${self.path} is not a valid class path"
+        return "${self.backend} is not a valid class path"
 
 
-class PathIsNotAuthSupplierError(BadPathSuppliedError):
+class BackendIsNotAuthSupplierError(BadBackendSuppliedError):
     def __str__(self) -> str:
-        return "${self.path} is not an implementation of AuthSupplier"
+        return "${self.backend} is not an implementation of AuthSupplier"
 
 
 class InvalidConfigError(AuthImproperlyConfiguredError):
