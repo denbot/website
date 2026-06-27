@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from authentication.enums import AuthStatus
 from authentication.exceptions import JWTValidationError
 from authentication.models import DenbotUser
-from authentication.utils.auth import Auth
+from authentication.utils.auth import get_auth_supplier
 from authentication.utils.validate_jwt import validate_jwt
 
 
@@ -17,7 +17,7 @@ class LoginAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         # don't create user here, wait until they have verified.
-        status = Auth.send_code(phone_number)
+        status = get_auth_supplier().send_code(phone_number)
         if status != AuthStatus.ERROR:
             return Response({"status": status})
         else:
@@ -47,7 +47,7 @@ class LoginOtpAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
-        status = Auth.verify_code(phone_number, verification_code)
+        status = get_auth_supplier().verify_code(phone_number, verification_code)
 
         response = Response({"status": status})
 
