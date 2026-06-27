@@ -92,7 +92,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom user model, since we use passwordless login
 AUTH_USER_MODEL = "authentication.DenbotUser"
-AUTHENTICATION_BACKENDS = ["authentication.backend.OTPBackend"]
 
 # Where do we redirect to if we run into a "login required" section
 LOGIN_URL = "/auth/login"
