@@ -1,3 +1,8 @@
+from django.core.exceptions import PermissionDenied
+
+from authentication.enums import AuthStatus
+
+
 class JWTValidationError(Exception):
     pass
 
@@ -77,3 +82,8 @@ class InvalidConfigError(AuthImproperlyConfiguredError):
 
     def __str__(self) -> str:
         return "Invalid ${self.classname} config: ${self.error}"
+
+
+class OtpAuthError(PermissionDenied):
+    def __init__(self, status: AuthStatus) -> None:
+        self.status = status
