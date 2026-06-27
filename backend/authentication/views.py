@@ -2,13 +2,12 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from django.conf import settings
-from django.contrib.auth import authenticate
 from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.enums import AuthStatus
-from authentication.exceptions import JWTValidationError, OtpAuthError
+from authentication.exceptions import JWTValidationError
 from authentication.models import DenbotUser
 from authentication.utils.auth import get_auth_supplier
 from authentication.utils.validate_jwt import validate_jwt
@@ -48,22 +47,15 @@ class LoginOtpAPIView(APIView):
     def post(self, request: HttpRequest) -> Response:
         phone_number = request.data.get("phoneNumber", "")
         verification_code = request.data.get("verificationCode", "")
-
-        status = AuthStatus.APPROVED
-        try:
-            user = authenticate(
-                request, phone_number=phone_number, otp=verification_code
-            )
-            if user is None:
-                status = AuthStatus.ERROR
-        except OtpAuthError as e:
-            status = e.status
+        status = get_auth_supplier().verify_code(phone_number, verification_code)
 
         response = Response({"status": status})
 
         if status == AuthStatus.ERROR:
             response.status_code = 500
         if status == AuthStatus.APPROVED:
+            # TODO: Don't create user here, should be a separate path for that
+            user = DenbotUser.objects.get_or_create_user(phone=phone_number)
             self.addJWT(user, response)
 
         return response
