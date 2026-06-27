@@ -212,9 +212,12 @@ export default function LoginForm() {
           variant="contained"
           size="large"
           disabled={resendTimer > 0}
+          sx={{ textTransform: 'none' }}
         >
           Resend Code
-          {resendTimer > 0 && <span> ({resendTimer}s)</span>}
+          {resendTimer > 0 && (
+            <span style={{ paddingLeft: '0.5em' }}> ({resendTimer}s)</span>
+          )}
         </Button>
       )}
     </Stack>
