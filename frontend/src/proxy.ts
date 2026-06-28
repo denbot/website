@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 
 import { CookieValidationResponse } from './models/cookie-validation-response.model';
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const url: NextURL = req.nextUrl.clone();
 
   const cookieHeader: string = req.headers.get('cookie') ?? '';
