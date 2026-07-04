@@ -1,16 +1,15 @@
-from datetime import datetime, timedelta, timezone
-
-import jwt
-from django.conf import settings
 from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.utils import datetime_to_epoch, datetime_from_epoch
 
 from authentication.enums import AuthStatus
 from authentication.exceptions import JWTValidationError
 from authentication.models import DenbotUser
 from authentication.utils.auth import get_auth_supplier
 from authentication.utils.validate_jwt import validate_jwt
+from denbot.seasons import get_end_of_fiscal_year
 
 
 class LoginAPIView(APIView):
@@ -25,23 +24,31 @@ class LoginAPIView(APIView):
 
 
 class LoginOtpAPIView(APIView):
-    def addJWT(self, user: DenbotUser, response: Response) -> None:
-        # for testing, 1 hour expiry, needs to be updated later.
-        # TODO: set end of the season
-
-        payload = {
-            "user_id": str(user.id),
-            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
-        }
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+    @staticmethod
+    def add_jwt(user: DenbotUser, response: Response) -> None:
+        refresh_token: RefreshToken = RefreshToken.for_user(user)
+        # Expiring at the end of the fiscal year just means students don't have to worry about logging in again in the
+        # middle of the build season.
+        refresh_token["exp"] = datetime_to_epoch(get_end_of_fiscal_year())
 
         response.set_cookie(
-            key="authToken",
-            value=token,
+            key="refresh_token",
+            value=refresh_token,
             httponly=True,
             secure=True,
             samesite="Lax",
-            max_age=3600,
+            path="/api/token/refresh",
+            expires=datetime_from_epoch(refresh_token["exp"]),
+        )
+
+        access_token = refresh_token.access_token
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+            expires=datetime_from_epoch(access_token["exp"]),
         )
 
     def post(self, request: HttpRequest) -> Response:
@@ -56,14 +63,14 @@ class LoginOtpAPIView(APIView):
         if status == AuthStatus.APPROVED:
             # TODO: Don't create user here, should be a separate path for that
             user = DenbotUser.objects.get_or_create_user(phone=phone_number)
-            self.addJWT(user, response)
+            self.add_jwt(user, response)
 
         return response
 
 
 class JWTVerificationView(APIView):
     def get(self, request: HttpRequest) -> Response:
-        token = request.COOKIES.get("authToken")
+        token = request.COOKIES.get("auth_token")
         try:
             payload = validate_jwt(token)
             return Response({"valid": True, "user_id": payload.get("user_id")})

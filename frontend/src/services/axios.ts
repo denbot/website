@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 export const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
-  timeout: 1000,
+  timeout: process.env.NODE_ENV === 'development' ? 0 : 60000,
 });
 
 axiosInstance.interceptors.response.use(
