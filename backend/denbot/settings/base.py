@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework_simplejwt",
     "phonenumber_field",  # Provides the PhoneNumberField we use in our models.
 ]
 
@@ -95,3 +96,9 @@ AUTH_USER_MODEL = "authentication.DenbotUser"
 
 # Where do we redirect to if we run into a "login required" section
 LOGIN_URL = "/auth/login"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}

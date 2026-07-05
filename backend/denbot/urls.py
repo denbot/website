@@ -18,6 +18,9 @@ Including another URLconf
 from django.urls import path
 from django.urls.conf import include
 
+from denbot.jwt import views as jwt_views
+
 urlpatterns = [
     path("auth/", include("authentication.urls")),
+    path("jwks.json", jwt_views.jwks_json, name="jwks")
 ]

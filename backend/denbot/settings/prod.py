@@ -10,7 +10,7 @@ if SECRET_KEY is None:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["den.bot"]
+ALLOWED_HOSTS = ["den.bot", "backend"]
 
 AUTH_SUPPLIER = {
     "BACKEND": "authentication.auth_suppliers.twilio_auth_supplier.TwilioAuthSupplier",

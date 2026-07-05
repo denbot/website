@@ -8,10 +8,19 @@ import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+
+
+import { DEFAULT_LANDING_PAGE } from '@/constants/routes';
 import { AuthStatus } from '@/models/auth-flow-response.model';
 import { login, loginOtp } from '@/services/authentication';
 
+
+
 import ThemedLogo from './themed-logo';
+
+
+
+
 
 const VERIFICATION_CODE_LENGTH = 6;
 const RESEND_TIMER_LENGTH = 30;
@@ -77,8 +86,15 @@ export default function LoginForm() {
   };
 
   const handleRedirect = () => {
-    const nextUrl = searchParams?.get('next') ?? '/';
-    router.replace(nextUrl);
+    const nextUrl = searchParams?.get('next') ?? DEFAULT_LANDING_PAGE;
+    router.replace(getNextSafeUrl(nextUrl));
+  };
+
+  const getNextSafeUrl = (next: string | null): string => {
+    if (!next) return DEFAULT_LANDING_PAGE;
+    if (!next.startsWith('/')) return DEFAULT_LANDING_PAGE; // reject absolute URLs (http://, https://)
+    if (next.startsWith('//') || next.startsWith('/\\')) return DEFAULT_LANDING_PAGE; // reject protocol-relative //evil.com
+    return next;
   };
 
   const isOtpValid = (code: string): boolean => {

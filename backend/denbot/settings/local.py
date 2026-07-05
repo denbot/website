@@ -11,3 +11,5 @@ ALLOWED_HOSTS = ["*"]
 AUTH_SUPPLIER = {
     "BACKEND": "authentication.auth_suppliers.dev_auth_supplier.DevAuthSupplier",
 }
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "backend"]
