@@ -8,10 +8,18 @@ import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+
+
 import { AuthStatus } from '@/models/auth-flow-response.model';
 import { login, loginOtp } from '@/services/authentication';
 
+
+
 import ThemedLogo from './themed-logo';
+
+
+
+
 
 const VERIFICATION_CODE_LENGTH = 6;
 const RESEND_TIMER_LENGTH = 30;
@@ -78,10 +86,10 @@ export default function LoginForm() {
 
   const handleRedirect = () => {
     const nextUrl = searchParams?.get('next') ?? '/';
-    router.replace(safeNext(nextUrl));
+    router.replace(getNextSafeUrl(nextUrl));
   };
 
-  const safeNext = (next: string | null): string => {
+  const getNextSafeUrl = (next: string | null): string => {
     if (!next) return '/'; // default landing
     if (!next.startsWith('/')) return '/'; // reject absolute URLs (http://, https://)
     if (next.startsWith('//') || next.startsWith('/\\')) return '/'; // reject protocol-relative //evil.com
