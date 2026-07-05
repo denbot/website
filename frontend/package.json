@@ -17,6 +17,7 @@
     "@mui/material": "^7.3.2",
     "@mui/material-nextjs": "^7.3.10",
     "axios": "^1.11.0",
+    "jose": "^6.2.3",
     "mui-tel-input": "^9.0.1",
     "next": "^16.2.9",
     "react": "^19.2.7",

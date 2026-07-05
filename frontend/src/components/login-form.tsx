@@ -78,7 +78,14 @@ export default function LoginForm() {
 
   const handleRedirect = () => {
     const nextUrl = searchParams?.get('next') ?? '/';
-    router.replace(nextUrl);
+    router.replace(safeNext(nextUrl));
+  };
+
+  const safeNext = (next: string | null): string => {
+    if (!next) return '/'; // default landing
+    if (!next.startsWith('/')) return '/'; // reject absolute URLs (http://, https://)
+    if (next.startsWith('//') || next.startsWith('/\\')) return '/'; // reject protocol-relative //evil.com
+    return next;
   };
 
   const isOtpValid = (code: string): boolean => {
