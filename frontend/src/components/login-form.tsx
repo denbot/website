@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from 'react';
 
 
 
+import { DEFAULT_LANDING_PAGE } from '@/constants/routes';
 import { AuthStatus } from '@/models/auth-flow-response.model';
 import { login, loginOtp } from '@/services/authentication';
 
@@ -85,14 +86,14 @@ export default function LoginForm() {
   };
 
   const handleRedirect = () => {
-    const nextUrl = searchParams?.get('next') ?? '/';
+    const nextUrl = searchParams?.get('next') ?? DEFAULT_LANDING_PAGE;
     router.replace(getNextSafeUrl(nextUrl));
   };
 
   const getNextSafeUrl = (next: string | null): string => {
-    if (!next) return '/'; // default landing
-    if (!next.startsWith('/')) return '/'; // reject absolute URLs (http://, https://)
-    if (next.startsWith('//') || next.startsWith('/\\')) return '/'; // reject protocol-relative //evil.com
+    if (!next) return DEFAULT_LANDING_PAGE;
+    if (!next.startsWith('/')) return DEFAULT_LANDING_PAGE; // reject absolute URLs (http://, https://)
+    if (next.startsWith('//') || next.startsWith('/\\')) return DEFAULT_LANDING_PAGE; // reject protocol-relative //evil.com
     return next;
   };
 
