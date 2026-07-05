@@ -35,9 +35,8 @@ export async function proxy(req: NextRequest) {
       }
     }
   }
-  const url = req.nextUrl.clone();
   const loginUrl = new URL(LOGIN_ROUTE, req.url);
-  loginUrl.searchParams.set('next', url.pathname + url.search);
+  loginUrl.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search);
   return NextResponse.redirect(loginUrl);
 }
 
