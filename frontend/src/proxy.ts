@@ -1,8 +1,14 @@
-import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { JWTPayload, createRemoteJWKSet, jwtVerify } from 'jose';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+
+
 import { LOGIN_ROUTE } from '@/constants/routes';
+
+
+
+
 
 const JWKS = createRemoteJWKSet(
   new URL(`${process.env.MIDDLEWARE_BACKEND_URL}/jwks.json`),
@@ -19,11 +25,15 @@ const EXPECTED_AUTH_FAILURES = new Set([
   'ERR_JWKS_NO_MATCHING_KEY',
 ]);
 
+interface JWTPayloadAdditionalClaims extends JWTPayload {
+  user_id: string;
+}
+
 export async function proxy(req: NextRequest) {
   const token = req.cookies.get('access_token')?.value;
   if (token) {
     try {
-      const { payload } = await jwtVerify(token, JWKS);
+      const { payload } = await jwtVerify<JWTPayloadAdditionalClaims>(token, JWKS);
       const headers = new Headers(req.headers);
       headers.set('x-user-id', String(payload.user_id ?? ''));
       return NextResponse.next({ request: { headers } });
