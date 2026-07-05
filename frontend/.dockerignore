@@ -1,0 +1,9 @@
+# Dev node install/run
+node_modules
+.next
+
+# Logs / local cruft
+npm-debug.log*
+.git
+.gitignore
+.env*.local
