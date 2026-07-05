@@ -1,0 +1,6 @@
+logs/*
+!logs/.gitkeep
+keys/*
+!keys/jwt/
+keys/jwt/*
+!keys/jwt/.gitkeep

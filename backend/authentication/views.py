@@ -1,15 +1,14 @@
 from django.http import HttpRequest
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.utils import datetime_to_epoch, datetime_from_epoch
+from rest_framework_simplejwt.utils import datetime_from_epoch
 
 from authentication.enums import AuthStatus
 from authentication.exceptions import JWTValidationError
 from authentication.models import DenbotUser
 from authentication.utils.auth import get_auth_supplier
 from authentication.utils.validate_jwt import validate_jwt
-from denbot.seasons import get_end_of_fiscal_year
+from denbot.jwt.tokens import DenbotRefreshToken
 
 
 class LoginAPIView(APIView):
@@ -26,10 +25,7 @@ class LoginAPIView(APIView):
 class LoginOtpAPIView(APIView):
     @staticmethod
     def add_jwt(user: DenbotUser, response: Response) -> None:
-        refresh_token: RefreshToken = RefreshToken.for_user(user)
-        # Expiring at the end of the fiscal year just means students don't have to worry about logging in again in the
-        # middle of the build season.
-        refresh_token["exp"] = datetime_to_epoch(get_end_of_fiscal_year())
+        refresh_token: DenbotRefreshToken = DenbotRefreshToken.for_user(user)
 
         response.set_cookie(
             key="refresh_token",
